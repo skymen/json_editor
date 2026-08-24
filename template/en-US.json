@@ -1,0 +1,812 @@
+{
+  "languageTag": "en-US",
+  "fileDescription": "Strings for skymen_jsoneditor.",
+  "text": {
+    "plugins": {
+      "skymen_jsoneditor": {
+        "name": "JSON Editor",
+        "description": "An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.",
+        "help-url": "https://www.construct.net",
+        "aceCategories": {
+          "appearance": "Appearance",
+          "editing": "Editing",
+          "navigation": "Navigation",
+          "source": "Source",
+          "tabs": "Tabs",
+          "events": "Events"
+        },
+        "properties": {
+          "group-source": {
+            "name": "Source",
+            "desc": "What the editor reads from and writes back to."
+          },
+          "source-object": {
+            "name": "Source object",
+            "desc": "The JSON, Dictionary or Array object to edit. Leave empty to bind from events instead."
+          },
+          "source-kind": {
+            "name": "Source kind",
+            "desc": "How to read the source object. Auto-detect picks by what the bound object supports.",
+            "items": {
+              "auto": "Auto-detect",
+              "json": "JSON",
+              "dictionary": "Dictionary",
+              "array": "Array",
+              "globals": "Global variables",
+              "none": "None"
+            }
+          },
+          "auto-refresh": {
+            "name": "Auto refresh",
+            "desc": "Re-read the source periodically so changes made by events show up in the editor."
+          },
+          "refresh-interval": {
+            "name": "Refresh interval (ms)",
+            "desc": "How often the source is re-read while Auto refresh is on."
+          },
+          "group-editing": {
+            "name": "Editing",
+            "desc": "What the user is allowed to change."
+          },
+          "allow-edit-values": {
+            "name": "Edit values",
+            "desc": "Allow editing scalar values. Turn off for a read-only viewer."
+          },
+          "allow-object-keys": {
+            "name": "Add/remove object keys",
+            "desc": "Show an add bar and a remove button on the keys of plain objects."
+          },
+          "allow-rename-keys": {
+            "name": "Rename keys",
+            "desc": "Make object key names editable in place."
+          },
+          "allow-array-elements": {
+            "name": "Add/remove array elements",
+            "desc": "Show the add bar and remove buttons on arrays."
+          },
+          "allow-reorder": {
+            "name": "Reorder array elements",
+            "desc": "Show the move up and move down buttons on arrays."
+          },
+          "allow-resize-c2array": {
+            "name": "Resize c2arrays",
+            "desc": "Allow the width, height and depth of a c2array to be changed."
+          },
+          "add-buttons": {
+            "name": "Add buttons",
+            "desc": "Which kinds of new entry the add bar offers.",
+            "items": {
+              "value": "Value only",
+              "value-array": "Value and array",
+              "value-object-array": "Value, object and array"
+            }
+          },
+          "group-c2": {
+            "name": "C2 formats",
+            "desc": "Special handling for the c2array and c2dictionary wrappers Construct writes."
+          },
+          "detect-c2array": {
+            "name": "Detect c2array",
+            "desc": "Show an object holding c2array/data/size as an editable grid."
+          },
+          "detect-c2array-string": {
+            "name": "Detect c2array in strings",
+            "desc": "Also parse string values that hold a serialised c2array, and write them back as strings."
+          },
+          "detect-c2dictionary": {
+            "name": "Detect c2dictionary",
+            "desc": "Show an object holding c2dictionary/data as a flat list of keys."
+          },
+          "detect-c2dictionary-string": {
+            "name": "Detect c2dictionary in strings",
+            "desc": "Also parse string values that hold a serialised c2dictionary, and write them back as strings."
+          },
+          "show-c2array-dims": {
+            "name": "Show c2array size",
+            "desc": "Show the width x height x depth inputs on a c2array."
+          },
+          "show-c2array-zbar": {
+            "name": "Show c2array z plane bar",
+            "desc": "Show the z plane selector when a c2array is more than one plane deep."
+          },
+          "group-appearance": {
+            "name": "Appearance",
+            "desc": "Theme and visible chrome."
+          },
+          "theme": {
+            "name": "Theme",
+            "desc": "Which built-in theme to start with.",
+            "items": {
+              "construct-dark": "Construct dark",
+              "construct-light": "Construct light",
+              "bare": "Bare (layout only)"
+            }
+          },
+          "custom-css": {
+            "name": "Custom CSS",
+            "desc": "A CSS file from the project's Files folder, loaded on startup."
+          },
+          "custom-css-mode": {
+            "name": "Custom CSS mode",
+            "desc": "Whether the custom CSS file adds to the built-in theme, so it only has to override what it wants, or replaces it outright.",
+            "items": {
+              "append": "Add on top of the theme",
+              "replace": "Replace the theme"
+            }
+          },
+          "ui-scale": {
+            "name": "UI scale",
+            "desc": "Multiplies the base font size the whole editor is laid out in."
+          },
+          "tab-bar": {
+            "name": "Tab bar",
+            "desc": "When to show the tab bar.",
+            "items": {
+              "auto": "Auto (hide when single)",
+              "always": "Always",
+              "never": "Never"
+            }
+          },
+          "show-filter": {
+            "name": "Show filter box",
+            "desc": "Show the key filter input in the toolbar."
+          },
+          "show-collapse-all": {
+            "name": "Show collapse all",
+            "desc": "Show the Collapse all button in the toolbar."
+          },
+          "show-close": {
+            "name": "Show close button",
+            "desc": "Show a close button in the tab bar."
+          },
+          "close-behaviour": {
+            "name": "Close behaviour",
+            "desc": "What the close button does after flushing pending edits. On close clicked fires either way.",
+            "items": {
+              "trigger": "Trigger only",
+              "hide": "Hide",
+              "destroy": "Destroy"
+            }
+          },
+          "group-advanced": {
+            "name": "Advanced",
+            "desc": "Tuning that rarely needs changing."
+          },
+          "long-value-chars": {
+            "name": "Long value length",
+            "desc": "Values longer than this get a resizable multi-line field instead of a single line one."
+          },
+          "commit-debounce": {
+            "name": "Commit debounce (ms)",
+            "desc": "How long typing pauses before an edit is written back to the source."
+          },
+          "press-freeze": {
+            "name": "Press freeze (ms)",
+            "desc": "Refreshes are held off for this long while a pointer is held down, so the tree cannot rebuild mid-drag."
+          },
+          "block-input": {
+            "name": "Block input",
+            "desc": "Stop clicks and key presses inside the editor from reaching the Mouse, Touch and Keyboard objects."
+          },
+          "override-cursor": {
+            "name": "Override cursor",
+            "desc": "Force a normal mouse cursor inside the editor, even if the game hides it."
+          },
+          "elem-id": {
+            "name": "ID",
+            "desc": "An optional id for the host element, allowing it to be positioned with CSS. Only used when the element is created."
+          },
+          "elem-class": {
+            "name": "Class",
+            "desc": "An optional class for the host element. Only used when the element is created."
+          },
+          "style-attribute": {
+            "name": "Style attribute",
+            "desc": "Initial content of the style attribute for the host element. Only used when the element is created."
+          }
+        },
+        "actions": {
+          "append-css": {
+            "list-name": "Append CSS",
+            "display-text": "Append CSS [i]{0}[/i]",
+            "description": "Stack extra rules on top of the current theme, so a built-in theme can be tweaked rather than rewritten. Replaces anything appended before.",
+            "params": {
+              "css": {
+                "name": "CSS",
+                "desc": "The rules to apply on top of the theme."
+              }
+            }
+          },
+          "clear-appended-css": {
+            "list-name": "Clear appended CSS",
+            "display-text": "Clear appended CSS",
+            "description": "Remove the rules added by Append CSS, leaving the theme alone.",
+            "params": {}
+          },
+          "load-css-from-file": {
+            "list-name": "Load CSS from file",
+            "display-text": "Load CSS from file [b]{0}[/b] ({1})",
+            "description": "Load a .css file from the project's Files folder, either on top of the current theme or in place of it.",
+            "params": {
+              "filename": {
+                "name": "File",
+                "desc": "The name of a .css file in the project's Files folder."
+              },
+              "mode": {
+                "name": "Mode",
+                "desc": "Whether the file adds to the current theme or replaces it.",
+                "items": {
+                  "append": "Add on top of the theme",
+                  "replace": "Replace the theme"
+                }
+              }
+            }
+          },
+          "set-close-behaviour": {
+            "list-name": "Set close behaviour",
+            "display-text": "Set close behaviour to [b]{0}[/b]",
+            "description": "What the close button does after flushing pending edits. On close clicked fires either way.",
+            "params": {
+              "mode": {
+                "name": "Behaviour",
+                "desc": "What happens when the close button is clicked.",
+                "items": {
+                  "trigger": "Trigger only",
+                  "hide": "Hide",
+                  "destroy": "Destroy"
+                }
+              }
+            }
+          },
+          "set-tab-bar": {
+            "list-name": "Set tab bar",
+            "display-text": "Set tab bar to [b]{0}[/b]",
+            "description": "When the tab bar should be shown.",
+            "params": {
+              "mode": {
+                "name": "Mode",
+                "desc": "When to show the tab bar.",
+                "items": {
+                  "auto": "Auto (hide when single)",
+                  "always": "Always",
+                  "never": "Never"
+                }
+              }
+            }
+          },
+          "set-theme": {
+            "list-name": "Set theme",
+            "display-text": "Set theme to [b]{0}[/b]",
+            "description": "Switch to one of the built-in themes.",
+            "params": {
+              "theme": {
+                "name": "Theme",
+                "desc": "The built-in theme to apply.",
+                "items": {
+                  "construct-dark": "Construct dark",
+                  "construct-light": "Construct light",
+                  "bare": "Bare (layout only)"
+                }
+              }
+            }
+          },
+          "set-theme-css": {
+            "list-name": "Set theme CSS",
+            "display-text": "Set theme CSS to [i]{0}[/i]",
+            "description": "Replace the theme layer with CSS supplied directly. Layout rules are applied first and are not affected.",
+            "params": {
+              "css": {
+                "name": "CSS",
+                "desc": "The stylesheet to use as the theme layer."
+              }
+            }
+          },
+          "set-ui-scale": {
+            "list-name": "Set UI scale",
+            "display-text": "Set UI scale to [b]{0}[/b]",
+            "description": "Multiply the base font size the whole editor is laid out in. Everything is sized in em, so this scales the tree as a whole.",
+            "params": {
+              "scale": {
+                "name": "Scale",
+                "desc": "The scale factor. 1 is the page's own font size."
+              }
+            }
+          },
+          "show-close-button": {
+            "list-name": "Show close button",
+            "display-text": "Set the close button [b]{0}[/b]",
+            "description": "Whether a close button is shown in the tab bar.",
+            "params": {
+              "enabled": {
+                "name": "Visible",
+                "desc": "Whether a close button is shown in the tab bar."
+              }
+            }
+          },
+          "show-collapse-all": {
+            "list-name": "Show collapse all",
+            "display-text": "Set the Collapse all button [b]{0}[/b]",
+            "description": "Whether the Collapse all button is shown in the toolbar.",
+            "params": {
+              "enabled": {
+                "name": "Visible",
+                "desc": "Whether the Collapse all button is shown in the toolbar."
+              }
+            }
+          },
+          "show-filter": {
+            "list-name": "Show filter box",
+            "display-text": "Set the filter box [b]{0}[/b]",
+            "description": "Whether the key filter input is shown in the toolbar.",
+            "params": {
+              "enabled": {
+                "name": "Visible",
+                "desc": "Whether the key filter input is shown in the toolbar."
+              }
+            }
+          },
+          "set-add-buttons": {
+            "list-name": "Set add buttons",
+            "display-text": "Set add buttons to [b]{0}[/b]",
+            "description": "Which kinds of new entry the add bars offer.",
+            "params": {
+              "mode": {
+                "name": "Mode",
+                "desc": "Which add buttons to show.",
+                "items": {
+                  "value": "Value only",
+                  "value-array": "Value and array",
+                  "value-object-array": "Value, object and array"
+                }
+              }
+            }
+          },
+          "set-allow-array-elements": {
+            "list-name": "Set add/remove array elements",
+            "display-text": "Set adding and removing array elements [b]{0}[/b]",
+            "description": "Whether elements can be added to and removed from arrays.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether elements can be added to and removed from arrays."
+              }
+            }
+          },
+          "set-allow-object-keys": {
+            "list-name": "Set add/remove object keys",
+            "display-text": "Set adding and removing object keys [b]{0}[/b]",
+            "description": "Whether keys can be added to and removed from plain objects.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether keys can be added to and removed from plain objects."
+              }
+            }
+          },
+          "set-allow-rename-keys": {
+            "list-name": "Set rename keys",
+            "display-text": "Set renaming keys [b]{0}[/b]",
+            "description": "Whether object key names can be edited in place.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether object key names can be edited in place."
+              }
+            }
+          },
+          "set-allow-reorder": {
+            "list-name": "Set reorder elements",
+            "display-text": "Set reordering array elements [b]{0}[/b]",
+            "description": "Whether the move up and move down buttons are shown.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether the move up and move down buttons are shown."
+              }
+            }
+          },
+          "set-allow-resize-c2array": {
+            "list-name": "Set resize c2arrays",
+            "display-text": "Set resizing c2arrays [b]{0}[/b]",
+            "description": "Whether the width, height and depth of a c2array can be changed.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether the width, height and depth of a c2array can be changed."
+              }
+            }
+          },
+          "set-detect-c2array": {
+            "list-name": "Set detect c2array",
+            "display-text": "Set detecting c2arrays [b]{0}[/b]",
+            "description": "Whether an object holding c2array data is shown as a grid.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether an object holding c2array data is shown as a grid."
+              }
+            }
+          },
+          "set-detect-c2array-string": {
+            "list-name": "Set detect c2array in strings",
+            "display-text": "Set detecting c2arrays inside strings [b]{0}[/b]",
+            "description": "Whether string values holding a serialised c2array are parsed and edited as grids.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether string values holding a serialised c2array are parsed and edited as grids."
+              }
+            }
+          },
+          "set-detect-c2dictionary": {
+            "list-name": "Set detect c2dictionary",
+            "display-text": "Set detecting c2dictionaries [b]{0}[/b]",
+            "description": "Whether an object holding c2dictionary data is shown as a flat key list.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether an object holding c2dictionary data is shown as a flat key list."
+              }
+            }
+          },
+          "set-detect-c2dictionary-string": {
+            "list-name": "Set detect c2dictionary in strings",
+            "display-text": "Set detecting c2dictionaries inside strings [b]{0}[/b]",
+            "description": "Whether string values holding a serialised c2dictionary are parsed and edited as key lists.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether string values holding a serialised c2dictionary are parsed and edited as key lists."
+              }
+            }
+          },
+          "set-edit-values": {
+            "list-name": "Set edit values",
+            "display-text": "Set editing values [b]{0}[/b]",
+            "description": "Whether scalar values can be edited.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether scalar values can be edited."
+              }
+            }
+          },
+          "set-show-c2array-size": {
+            "list-name": "Set show c2array size",
+            "display-text": "Set showing the c2array size inputs [b]{0}[/b]",
+            "description": "Whether the width x height x depth inputs are shown on a c2array.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether the width x height x depth inputs are shown on a c2array."
+              }
+            }
+          },
+          "set-show-c2array-zbar": {
+            "list-name": "Set show c2array z plane bar",
+            "display-text": "Set showing the c2array z plane bar [b]{0}[/b]",
+            "description": "Whether the z plane selector is shown on a c2array deeper than one plane.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether the z plane selector is shown on a c2array deeper than one plane."
+              }
+            }
+          },
+          "collapse-all": {
+            "list-name": "Collapse all",
+            "display-text": "Collapse all",
+            "description": "Clear the filter and close everything, down to the outer braces.",
+            "params": {}
+          },
+          "collapse-path": {
+            "list-name": "Collapse path",
+            "display-text": "Collapse [b]{0}[/b]",
+            "description": "Close one branch, leaving the rest of the tree alone.",
+            "params": {
+              "path": {
+                "name": "Path",
+                "desc": "A dot separated path, as the JSON plugin writes them, such as \"player.inventory.2.name\"."
+              }
+            }
+          },
+          "expand-all": {
+            "list-name": "Expand all",
+            "display-text": "Expand all",
+            "description": "Open every branch of the current tab. Slow on a large document, since the whole tree is built at once.",
+            "params": {}
+          },
+          "expand-path": {
+            "list-name": "Expand path",
+            "display-text": "Expand [b]{0}[/b]",
+            "description": "Open a branch and everything above it.",
+            "params": {
+              "path": {
+                "name": "Path",
+                "desc": "A dot separated path, as the JSON plugin writes them, such as \"player.inventory.2.name\"."
+              }
+            }
+          },
+          "scroll-to-path": {
+            "list-name": "Scroll to path",
+            "display-text": "Scroll to [b]{0}[/b]",
+            "description": "Open a branch and scroll it into view.",
+            "params": {
+              "path": {
+                "name": "Path",
+                "desc": "A dot separated path, as the JSON plugin writes them, such as \"player.inventory.2.name\"."
+              }
+            }
+          },
+          "set-filter-text": {
+            "list-name": "Set filter text",
+            "display-text": "Set filter to [i]{0}[/i]",
+            "description": "Filter the tree to keys matching this text. An empty string clears the filter.",
+            "params": {
+              "text": {
+                "name": "Text",
+                "desc": "The text to match key names against."
+              }
+            }
+          },
+          "refresh": {
+            "list-name": "Refresh",
+            "display-text": "Refresh",
+            "description": "Re-read every tab's source now. Only needed when auto refresh is off.",
+            "params": {}
+          },
+          "set-auto-refresh": {
+            "list-name": "Set auto refresh",
+            "display-text": "Set auto refresh [b]{0}[/b]",
+            "description": "Turn periodic re-reading of the source on or off.",
+            "params": {
+              "enabled": {
+                "name": "Enabled",
+                "desc": "Whether to re-read the source periodically."
+              }
+            }
+          },
+          "set-refresh-interval": {
+            "list-name": "Set refresh interval",
+            "display-text": "Set refresh interval to [b]{0}[/b] ms",
+            "description": "How often the source is re-read while auto refresh is on.",
+            "params": {
+              "interval": {
+                "name": "Interval",
+                "desc": "Milliseconds between reads."
+              }
+            }
+          },
+          "set-source-kind": {
+            "list-name": "Set source kind",
+            "display-text": "Set source kind of tab [i]{1}[/i] to [b]{0}[/b]",
+            "description": "Choose how the bound object is read, or bind the tab to the project's global variables.",
+            "params": {
+              "kind": {
+                "name": "Kind",
+                "desc": "How to read the source.",
+                "items": {
+                  "auto": "Auto-detect",
+                  "json": "JSON",
+                  "dictionary": "Dictionary",
+                  "array": "Array",
+                  "globals": "Global variables",
+                  "none": "None"
+                }
+              },
+              "tab": {
+                "name": "Tab",
+                "desc": "Which tab to change. Leave empty for the current tab."
+              }
+            }
+          },
+          "set-source-object": {
+            "list-name": "Set source object",
+            "display-text": "Set source of tab [i]{1}[/i] to [b]{0}[/b]",
+            "description": "Point the editor at a JSON, Dictionary or Array object. The first instance is used unless one is picked.",
+            "params": {
+              "object": {
+                "name": "Object",
+                "desc": "The object to edit."
+              },
+              "tab": {
+                "name": "Tab",
+                "desc": "Which tab to change. Leave empty for the current tab."
+              }
+            }
+          },
+          "set-source-uid": {
+            "list-name": "Set source by UID",
+            "display-text": "Set source of tab [i]{1}[/i] to UID [b]{0}[/b]",
+            "description": "Point the editor at one specific instance, by its unique ID.",
+            "params": {
+              "uid": {
+                "name": "UID",
+                "desc": "The unique ID of the instance to edit."
+              },
+              "tab": {
+                "name": "Tab",
+                "desc": "Which tab to change. Leave empty for the current tab."
+              }
+            }
+          },
+          "add-tab": {
+            "list-name": "Add tab",
+            "display-text": "Add tab [b]{0}[/b] labelled [i]{1}[/i] for [b]{3}[/b] ({2})",
+            "description": "Add a tab, or reconfigure one that already exists. The tab bar appears once there is more than one tab.",
+            "params": {
+              "tab": {
+                "name": "Tab ID",
+                "desc": "A name for this tab, used by the other tab actions."
+              },
+              "label": {
+                "name": "Label",
+                "desc": "The text shown on the tab button."
+              },
+              "kind": {
+                "name": "Kind",
+                "desc": "How to read the source.",
+                "items": {
+                  "auto": "Auto-detect",
+                  "json": "JSON",
+                  "dictionary": "Dictionary",
+                  "array": "Array",
+                  "globals": "Global variables",
+                  "none": "None"
+                }
+              },
+              "object": {
+                "name": "Object",
+                "desc": "The object this tab edits. Ignored for global variables."
+              }
+            }
+          },
+          "clear-tabs": {
+            "list-name": "Clear tabs",
+            "display-text": "Clear tabs",
+            "description": "Remove every tab, leaving the editor unbound.",
+            "params": {}
+          },
+          "remove-tab": {
+            "list-name": "Remove tab",
+            "display-text": "Remove tab [b]{0}[/b]",
+            "description": "Remove a tab and everything the editor remembered about it.",
+            "params": {
+              "tab": {
+                "name": "Tab ID",
+                "desc": "The tab to remove."
+              }
+            }
+          },
+          "select-tab": {
+            "list-name": "Select tab",
+            "display-text": "Select tab [b]{0}[/b]",
+            "description": "Switch to a tab, as clicking its button would.",
+            "params": {
+              "tab": {
+                "name": "Tab ID",
+                "desc": "The tab to show."
+              }
+            }
+          }
+        },
+        "conditions": {
+          "on-any-edit": {
+            "list-name": "On any edit",
+            "display-text": "On any edit",
+            "description": "Triggered after any edit at all, in addition to the specific trigger for it.",
+            "params": {}
+          },
+          "on-close-clicked": {
+            "list-name": "On close clicked",
+            "display-text": "On close clicked",
+            "description": "Triggered when the close button is clicked, after pending edits have been written.",
+            "params": {}
+          },
+          "on-element-added": {
+            "list-name": "On element added",
+            "display-text": "On element added",
+            "description": "Triggered after an element has been added to an array or a c2array.",
+            "params": {}
+          },
+          "on-element-removed": {
+            "list-name": "On element removed",
+            "display-text": "On element removed",
+            "description": "Triggered after an element has been removed from an array or a c2array.",
+            "params": {}
+          },
+          "on-element-reordered": {
+            "list-name": "On element reordered",
+            "display-text": "On element reordered",
+            "description": "Triggered after an array element has been moved. LastOldValue holds the index it came from.",
+            "params": {}
+          },
+          "on-field-blurred": {
+            "list-name": "On field blurred",
+            "display-text": "On field blurred",
+            "description": "Triggered when a value field loses focus. LastPath holds its path.",
+            "params": {}
+          },
+          "on-field-focused": {
+            "list-name": "On field focused",
+            "display-text": "On field focused",
+            "description": "Triggered when the user puts the caret in a value field. LastPath holds its path.",
+            "params": {}
+          },
+          "on-key-added": {
+            "list-name": "On key added",
+            "display-text": "On key added",
+            "description": "Triggered after a key has been added to an object or a dictionary.",
+            "params": {}
+          },
+          "on-key-removed": {
+            "list-name": "On key removed",
+            "display-text": "On key removed",
+            "description": "Triggered after a key has been removed from an object or a dictionary.",
+            "params": {}
+          },
+          "on-key-renamed": {
+            "list-name": "On key renamed",
+            "display-text": "On key renamed",
+            "description": "Triggered after a key has been renamed. LastOldValue holds the previous name.",
+            "params": {}
+          },
+          "on-value-changed": {
+            "list-name": "On value changed",
+            "display-text": "On value changed",
+            "description": "Triggered after a value edited in the editor has been written to the source.",
+            "params": {}
+          },
+          "on-tab-selected": {
+            "list-name": "On tab selected",
+            "display-text": "On tab selected",
+            "description": "Triggered when the user switches to a different tab.",
+            "params": {}
+          }
+        },
+        "expressions": {
+          "theme": {
+            "translated-name": "Theme",
+            "description": "The name of the current built-in theme, or \"custom\" when CSS was supplied directly.",
+            "params": {}
+          },
+          "last-key": {
+            "translated-name": "LastKey",
+            "description": "The key or index the last edit touched.",
+            "params": {}
+          },
+          "last-old-value": {
+            "translated-name": "LastOldValue",
+            "description": "What was there before the last edit: the previous value, the previous key name, or the index an element came from.",
+            "params": {}
+          },
+          "last-path": {
+            "translated-name": "LastPath",
+            "description": "The dot separated path of the last edit or focus change, such as player.inventory.2.name.",
+            "params": {}
+          },
+          "last-value": {
+            "translated-name": "LastValue",
+            "description": "The value the last edit wrote. Empty for removals.",
+            "params": {}
+          },
+          "filter-text": {
+            "translated-name": "FilterText",
+            "description": "The filter text last set by an action.",
+            "params": {}
+          },
+          "current-tab": {
+            "translated-name": "CurrentTab",
+            "description": "The ID of the tab currently being shown.",
+            "params": {}
+          },
+          "last-tab-id": {
+            "translated-name": "LastTabId",
+            "description": "The ID of the tab the last edit or tab change happened on.",
+            "params": {}
+          }
+        }
+      }
+    }
+  }
+}

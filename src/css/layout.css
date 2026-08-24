@@ -1,0 +1,313 @@
+/*
+ * Layout layer. Always applied, never replaced by a theme.
+ *
+ * This file owns structure only: display, flex, grid, sizing, overflow,
+ * spacing and the resets below. It sets no colours, borders, fonts or
+ * shadows, so a theme can be written without restating any of it.
+ *
+ * The resets matter more than usual here because the editor lives in a shadow
+ * root. A shadow boundary stops outside *selectors* from matching, but
+ * inherited properties still cross it, so cursor, colour, font, line-height
+ * and direction have to be set explicitly or the game's own styling leaks in.
+ */
+
+:host {
+  display: block;
+  overflow: auto;
+  overscroll-behavior: contain;
+  contain: paint;
+}
+
+.je {
+  /* Layout metrics. A theme may override these; it does not have to. */
+  --je-input-w: 12em;
+  --je-actions-w: 4.2em;
+  --je-gap: 0.3em;
+  --je-border: 0.08em;
+  --je-radius: 0.25em;
+
+  /* Inherited properties that must not come from the page. */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-style: normal;
+  font-weight: normal;
+  font-size: calc(1em * var(--je-scale, 1));
+  line-height: 1.55;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  direction: ltr;
+  white-space: normal;
+
+  width: 100%;
+  min-height: 100%;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* The game may set cursor:none while playing, which inherits in. The specific
+   rules further down (text in fields, pointer on buttons) still win, because
+   children inherit this value rather than matching this selector. */
+.je-cursor-override,
+.je-cursor-override * {
+  cursor: auto;
+}
+.je-cursor-override .je-key,
+.je-cursor-override .je-idx,
+.je-cursor-override .je-badge,
+.je-cursor-override .je-col-label,
+.je-cursor-override .je-message,
+.je-cursor-override .je-caret {
+  cursor: default;
+}
+.je-cursor-override .je-btn,
+.je-cursor-override .je-head {
+  cursor: pointer;
+}
+.je-cursor-override .je-val,
+.je-cursor-override .je-search,
+.je-cursor-override .je-dim,
+.je-cursor-override .je-keyedit {
+  cursor: text;
+}
+
+/* An input sized var(--je-input-w) in a flex row has to come out exactly as
+   wide as a grid column of the same width, or the two stop lining up. */
+.je,
+.je * {
+  box-sizing: border-box;
+}
+
+.je-body {
+  padding: 0.25em 0.45em 0.5em 0.45em;
+}
+
+/* --------------------------------------------------------------- toolbar */
+
+.je-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.je-header[hidden] {
+  display: none;
+}
+
+.je-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4em;
+  padding: 0.2em 0.35em;
+}
+.je-bar[hidden] {
+  display: none;
+}
+.je-bar > .je-btn {
+  padding: 0 0.5em;
+}
+
+.je-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.je-tab {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 0.55em;
+}
+
+.je-close {
+  flex: 0 0 auto;
+  min-width: 1.6em;
+  font-weight: bold;
+  line-height: 1.15;
+}
+
+.je-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.05em 0.4em;
+}
+
+/* ------------------------------------------------------------------ tree */
+
+.je-children {
+  margin-left: 0.55em;
+  padding-left: 0.6em;
+}
+.je-children[hidden] {
+  display: none;
+}
+.je > .je-body > .je-node > .je-children {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
+}
+
+.je-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.05em 0.25em;
+  border-radius: var(--je-radius);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.je-caret {
+  flex: 0 0 auto;
+  width: 0.8em;
+  text-align: center;
+  transition: transform 0.12s ease;
+}
+.je-node.je-open > .je-head > .je-caret {
+  transform: rotate(90deg);
+}
+.je-badge {
+  flex: 0 0 auto;
+  font-size: 0.85em;
+}
+.je-spacer {
+  flex: 1 1 auto;
+}
+
+.je-row {
+  display: flex;
+  align-items: center;
+  gap: var(--je-gap);
+  padding: 0.05em 0.25em;
+}
+.je-key {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.je-keyedit {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.05em 0.35em;
+}
+.je-idx {
+  flex: 0 0 auto;
+  min-width: 2em;
+}
+.je-actions {
+  flex: 0 0 var(--je-actions-w);
+  display: flex;
+  gap: 0.15em;
+  justify-content: flex-end;
+}
+.je-addbar {
+  display: flex;
+  gap: 0.15em;
+  padding: 0.1em 0.25em 0.05em 0.25em;
+}
+
+/* ---------------------------------------------------------------- fields */
+
+.je-val {
+  flex: 0 0 var(--je-input-w);
+  width: var(--je-input-w);
+  min-width: 0;
+  padding: 0.05em 0.35em;
+}
+
+/* A value too long for one line takes the whole row and becomes resizable. */
+.je-row.je-block {
+  flex-wrap: wrap;
+}
+.je-row.je-block > .je-actions {
+  order: 1;
+}
+.je-row.je-block > .je-val {
+  order: 2;
+  flex: 1 1 100%;
+  width: auto;
+  margin-top: 0.15em;
+  resize: vertical;
+  min-height: 3.5em;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.je-btn {
+  flex: 0 0 auto;
+  min-width: 1.3em;
+  line-height: 1.3;
+  text-align: center;
+  padding: 0 0.25em;
+}
+
+/* Form controls do not inherit type styling on their own. */
+.je-btn,
+.je-val,
+.je-search,
+.je-dim,
+.je-keyedit {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+/* --------------------------------------------------------------- c2array */
+
+.je-dims {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+}
+.je-dim {
+  width: 3.2em;
+  font-size: 0.9em;
+  padding: 0 0.2em;
+  text-align: center;
+  /* Spinners would otherwise reserve width and clip the digits. */
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
+.je-dim::-webkit-inner-spin-button,
+.je-dim::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.je-zbar {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.15em 0.25em;
+  font-size: 0.9em;
+}
+.je-grid {
+  display: grid;
+  gap: 0.1em var(--je-gap);
+  align-items: center;
+  padding: 0.05em 0.25em;
+}
+.je-grid > .je-val {
+  flex: none;
+  width: auto;
+  min-width: 0;
+}
+.je-grid > textarea.je-val {
+  resize: vertical;
+  min-height: 3.5em;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.je-col-label {
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.je-message {
+  padding: 0.4em 0.25em;
+}

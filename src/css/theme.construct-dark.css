@@ -1,0 +1,46 @@
+/*
+ * Construct dark. Variables only - the descriptive rules live in
+ * theme.base.css, which the addon applies ahead of this block.
+ */
+
+.je {
+  --je-fg: #dcdcdc;
+  --je-muted: #9a9a9a;
+  --je-dim: #808080;
+  --je-placeholder: #6a6a6a;
+  --je-accent: #4a90d9;
+
+  --je-bg: #2a2d31;
+  --je-bar-bg: #34383d;
+  --je-outline: #1d1f22;
+  --je-line: #43474d;
+  --je-hover-bg: rgba(255, 255, 255, 0.07);
+
+  --je-field-bg: #1e2124;
+  --je-field-bg-focus: #16181a;
+  --je-field-border: #4a4f56;
+
+  --je-btn-bg: #3c4147;
+  --je-btn-bg-hover: #4b5158;
+  --je-btn-bg-disabled: #33373b;
+  --je-btn-border: #52585f;
+
+  --je-add-bg: #2f6b40;
+  --je-add-border: #48a061;
+  --je-del-bg: #74282c;
+  --je-del-border: #b0484e;
+
+  --je-tab-on-bg: #3a6ea5;
+  --je-tab-on-bg-hover: #4880bb;
+  --je-tab-on-fg: #ffffff;
+
+  --je-key: #7fb2e5;
+  --je-key-hit: #ffd479;
+  --je-t-number: #b5cea8;
+  --je-t-string: #ce9178;
+  --je-t-keyword: #c586c0;
+
+  --je-invalid-fg: #ff8b82;
+  --je-invalid-bg: #4a1a1d;
+  --je-invalid-border: #d0413b;
+}

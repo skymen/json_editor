@@ -1,0 +1,46 @@
+/*
+ * Construct light. Variables only - the descriptive rules live in
+ * theme.base.css, which the addon applies ahead of this block.
+ */
+
+.je {
+  --je-fg: #1f2328;
+  --je-muted: #626b75;
+  --je-dim: #7b848e;
+  --je-placeholder: #9aa2ab;
+  --je-accent: #1a73e8;
+
+  --je-bg: #f4f5f7;
+  --je-bar-bg: #e6e8eb;
+  --je-outline: #c4c8cd;
+  --je-line: #d3d7dc;
+  --je-hover-bg: rgba(0, 0, 0, 0.06);
+
+  --je-field-bg: #ffffff;
+  --je-field-bg-focus: #ffffff;
+  --je-field-border: #bcc2c9;
+
+  --je-btn-bg: #e0e3e7;
+  --je-btn-bg-hover: #d0d5db;
+  --je-btn-bg-disabled: #eaecef;
+  --je-btn-border: #b8bec5;
+
+  --je-add-bg: #bfe3c8;
+  --je-add-border: #3f9d5b;
+  --je-del-bg: #f3c7c9;
+  --je-del-border: #c0454c;
+
+  --je-tab-on-bg: #cfe0f7;
+  --je-tab-on-bg-hover: #bcd5f4;
+  --je-tab-on-fg: #12325c;
+
+  --je-key: #1a5fb4;
+  --je-key-hit: #a15c00;
+  --je-t-number: #2e7d32;
+  --je-t-string: #b35309;
+  --je-t-keyword: #7b1fa2;
+
+  --je-invalid-fg: #a3231b;
+  --je-invalid-bg: #fbdedc;
+  --je-invalid-border: #d0413b;
+}

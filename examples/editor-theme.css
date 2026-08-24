@@ -1,0 +1,88 @@
+/*
+ * Example custom theme for the JSON Editor plugin.
+ *
+ * Put a copy of this in the project's Files folder, name it in the editor's
+ * "Custom CSS" property, and leave "Custom CSS mode" on "Add on top of the
+ * theme". Everything below is a variable override, so the built-in theme keeps
+ * supplying the actual rules and this file only has to say what is different.
+ *
+ * To describe the rules yourself instead, switch the mode to "Replace the
+ * theme" and write ordinary CSS against the class names listed at the bottom.
+ * Layout is applied first either way and is never affected by a theme.
+ */
+
+.je {
+  /* Text */
+  --je-fg: #e6e1d8;
+  --je-muted: #9b9384;
+  --je-dim: #837b6d;
+  --je-placeholder: #6d665a;
+  --je-accent: #d8a657;
+
+  /* Surfaces */
+  --je-bg: #282828;
+  --je-bar-bg: #32302f;
+  --je-outline: #1d2021;
+  --je-line: #45403d;
+  --je-hover-bg: rgba(255, 255, 255, 0.06);
+
+  /* Fields */
+  --je-field-bg: #1d2021;
+  --je-field-bg-focus: #16181a;
+  --je-field-border: #504945;
+
+  /* Buttons */
+  --je-btn-bg: #3c3836;
+  --je-btn-bg-hover: #504945;
+  --je-btn-bg-disabled: #32302f;
+  --je-btn-border: #504945;
+  --je-add-bg: #4b642f;
+  --je-add-border: #a9b665;
+  --je-del-bg: #6b2b2b;
+  --je-del-border: #ea6962;
+
+  /* Tabs */
+  --je-tab-on-bg: #45403d;
+  --je-tab-on-bg-hover: #504945;
+  --je-tab-on-fg: #ffffff;
+
+  /* Syntax */
+  --je-key: #7daea3;
+  --je-key-hit: #d8a657;
+  --je-t-number: #a9b665;
+  --je-t-string: #e78a4e;
+  --je-t-keyword: #d3869b;
+
+  /* Invalid input */
+  --je-invalid-fg: #ea6962;
+  --je-invalid-bg: #43242b;
+  --je-invalid-border: #c14a3d;
+
+  /* Layout metrics. Defined by the layout layer, overridable from here. */
+  /* --je-input-w: 12em; */
+  /* --je-actions-w: 4.2em; */
+  /* --je-gap: 0.3em; */
+  /* --je-border: 0.08em; */
+  /* --je-radius: 0.25em; */
+}
+
+/*
+ * Rules beyond the variables are fine too. These are the class names the
+ * layout layer uses:
+ *
+ *   .je            the editor root
+ *   .je-header     sticky header holding the bars
+ *   .je-bar        one toolbar row
+ *   .je-tabs .je-tab .je-on    tab bar, one tab, the active tab
+ *   .je-close      close button
+ *   .je-search     the key filter input
+ *   .je-node .je-open          a container, and one that is expanded
+ *   .je-head .je-caret .je-badge
+ *   .je-children   a container's contents
+ *   .je-row .je-block          a value row, and one wide enough to wrap
+ *   .je-key .je-hit .je-idx .je-keyedit
+ *   .je-val .je-invalid .je-t-number .je-t-string .je-t-keyword
+ *   .je-actions .je-btn .je-add .je-del .je-addbar .je-spacer
+ *   .je-dims .je-dim .je-zbar .je-grid .je-col-label
+ *   .je-message    "(empty)", "(no matches)" and error text
+ */

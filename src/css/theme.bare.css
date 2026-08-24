@@ -1,0 +1,8 @@
+/*
+ * Bare. No theme layer at all: layout.css runs on its own, so the editor
+ * inherits the page's colours and the browser's default control styling.
+ *
+ * This is the intended starting point for a custom theme. Either append your
+ * own rules on top of it, or replace the theme layer outright with
+ * "Set theme CSS".
+ */
