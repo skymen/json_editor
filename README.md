@@ -8,12 +8,7 @@
 <sub> [See all releases](https://github.com/skymen/json_editor/releases) </sub> <br>
 
 #### What's New in 1.0.0.0
-- **Added:** First release. A DOM plugin that edits a JSON, Dictionary or Array object, or the project's global variables, as a tree in the running game.
-- **Added:** Tabs, built from events, each with its own expansion, filter and z plane state.
-- **Added:** c2array and c2dictionary support, in object form and in string form, each independently toggleable.
-- **Added:** Per capability editing permissions: values, object keys, key renaming, array elements, reordering, c2array resizing.
-- **Added:** Three built-in themes and a two layer stylesheet, so a custom theme only has to describe colour. Set theme, Load CSS file and Load CSS string are the whole styling surface.
-- **Added:** Edit, focus and close triggers with dot separated paths matching the JSON plugin.
+- **Added:** Initial release.
 
 <sub>[View full changelog](#changelog)</sub>
 
@@ -175,9 +170,4 @@ npm run dev
 ## Changelog
 
 **1.0.0.0**
-- **Added:** First release. A DOM plugin that edits a JSON, Dictionary or Array object, or the project's global variables, as a tree in the running game.
-- **Added:** Tabs, built from events, each with its own expansion, filter and z plane state.
-- **Added:** c2array and c2dictionary support, in object form and in string form, each independently toggleable.
-- **Added:** Per capability editing permissions: values, object keys, key renaming, array elements, reordering, c2array resizing.
-- **Added:** Three built-in themes and a two layer stylesheet, so a custom theme only has to describe colour. Set theme, Load CSS file and Load CSS string are the whole styling surface.
-- **Added:** Edit, focus and close triggers with dot separated paths matching the JSON plugin.
+- **Added:** Initial release.
