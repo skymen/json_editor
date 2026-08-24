@@ -4,22 +4,23 @@
  * This is the shared half of the two Construct themes: it reproduces *how* C3
  * draws its controls, while theme.construct-dark.css and -light.css supply the
  * greys. C3's own two themes relate to each other exactly this way - identical
- * rules, one grey ramp, read from opposite ends - so the split is not an
- * invention, it is how the real thing is built.
+ * rules, one grey ramp, read from opposite ends.
+ *
+ * The editor is modelled on a C3 *dialog*, not a docked pane: a dialog body
+ * sits on gray11 with a lighter caption above it, which is why the panel is
+ * mid-grey rather than near-black.
  *
  * The idioms, taken from Construct's theme CSS rather than guessed at:
  *
- *   1. No borders. Controls are separated by fill alone; the only lines in the
- *      whole UI are 1px dividers.
- *   2. Small radii, and only where C3 uses them: 2px on tree rows, 3px on
- *      fields, 4px on buttons. Tabs are rounded on the bottom edge only.
+ *   1. No borders. Controls are separated by fill alone; the only lines are
+ *      1px dividers.
+ *   2. Small radii, and only where C3 uses them: 2px rows, 3px fields and
+ *      buttons, 6px on the panel. Search fields are fully rounded pills.
  *   3. Pressing inverts. A held button swaps to a near-white fill with dark
- *      text (and the reverse in the light theme). C3 does this on toolbar
- *      buttons, property buttons and tree selection alike.
- *   4. Focus darkens the field rather than drawing a ring, and brightens its
- *      text to full white.
- *   5. Inactive tabs fade with opacity rather than changing colour: 0.35
- *      resting, 0.9 hovered, 1 active with a heavier weight.
+ *      text, and the reverse in the light theme.
+ *   4. Focus darkens the field rather than drawing a ring.
+ *   5. Tabs carry no vertical padding, are rounded along their free bottom
+ *      edge only, and fade with opacity when inactive.
  *
  * Layout lives in layout.css and is always applied first. Nothing here sets
  * display, flex, grid, width or height.
@@ -32,13 +33,13 @@
 }
 
 .je-body {
-  padding: 0.3em 0.45em 0.5em 0.45em;
+  padding: 0.4em 0.5em 0.6em 0.5em;
 }
 
 /* ------------------------------------------------------------------- bars */
 
 .je-bar {
-  padding: 0.25em 0.3em;
+  padding: 0.25em 0.35em;
   background: var(--je-bar-bg);
 }
 .je-header > .je-bar:first-child {
@@ -48,22 +49,25 @@
   border-bottom: 1px solid var(--je-line);
 }
 
-/* Tabs hang off the bar and are rounded along the bottom, the way C3 rounds a
-   top-docked tab bar. Inactive ones are the same fill at low opacity. */
+/* A C3 tab has no vertical padding - its height comes from line-height - and
+   is rounded only along the edge that hangs free of the bar. */
 .je-tab {
-  padding: 0.1em 0.7em;
+  padding: 0 0.7em;
+  line-height: 1.9;
   border: none;
   border-radius: 0 0 var(--je-radius-tab) var(--je-radius-tab);
   color: var(--je-tab-fg);
   background: var(--je-tab-bg);
-  opacity: 0.35;
+  opacity: 0.45;
 }
-.je-tab:hover {
-  opacity: 0.9;
+.je-tab:not(.je-on):hover {
+  opacity: 0.8;
 }
 .je-tab.je-on {
   font-weight: 500;
   opacity: 1;
+  color: var(--je-tab-on-fg);
+  background: var(--je-tab-on-bg);
 }
 
 .je-close {
@@ -76,12 +80,11 @@
 }
 .je-close:hover {
   color: var(--je-press-fg);
-  background: var(--je-del-border);
+  background: var(--je-danger);
 }
 
 /* ----------------------------------------------------------------- fields */
 
-.je-search,
 .je-val,
 .je-dim,
 .je-keyedit {
@@ -91,6 +94,16 @@
   border-radius: var(--je-radius-control);
   background: var(--je-field-bg);
 }
+
+/* C3's search fields are pills, unlike every other input. */
+.je-search {
+  padding: 0.1em 0.9em;
+  color: var(--je-fg);
+  border: none;
+  border-radius: 999px;
+  background: var(--je-field-bg);
+}
+
 .je-search:hover,
 .je-val:hover:enabled,
 .je-dim:hover:enabled,
@@ -151,6 +164,8 @@
   font-size: 0.85em;
   color: var(--je-dim);
 }
+/* Key names take the colour C3 gives a property *value*, so the tree reads
+   like the properties bar rather than shouting in the accent colour. */
 .je-key {
   color: var(--je-key);
 }
@@ -170,7 +185,7 @@
 /* ---------------------------------------------------------------- buttons */
 
 .je-btn {
-  padding: 0 0.4em;
+  padding: 0 0.35em;
   color: var(--je-btn-fg);
   border: none;
   border-radius: var(--je-radius-control);
@@ -191,11 +206,11 @@
 }
 .je-add:hover:enabled {
   color: var(--je-press-fg);
-  background: var(--je-add-border);
+  background: var(--je-accent);
 }
 .je-del:hover:enabled {
   color: var(--je-press-fg);
-  background: var(--je-del-border);
+  background: var(--je-danger);
 }
 .je-addbar {
   padding: 0.15em 0.3em 0.05em 0.3em;

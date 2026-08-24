@@ -370,7 +370,6 @@ export class Editor {
       state.zSlice = new Map(saved.zSlice ?? []);
       state.query = saved.query ?? "";
       state.scrollTop = saved.scrollTop ?? 0;
-      state.rootOpened = true;
     }
 
     if (payload.active && this.tabs.has(payload.active))
@@ -592,13 +591,7 @@ export class Editor {
     }
 
     if (isContainer(data)) {
-      if (!state.rootOpened) {
-        state.expanded.add(ROOT_PATH);
-        state.rootOpened = true;
-      }
-      this.body.replaceChildren(
-        this._buildRootNode(data),
-      );
+      this.body.replaceChildren(this._buildRoot(data));
     } else if (data === null || data === undefined) {
       this.body.replaceChildren(
         make("div", "je-message", "No data to show for this tab."),
@@ -617,16 +610,23 @@ export class Editor {
     this._reportViewState();
   }
 
-  _buildRootNode(data) {
+  /**
+   * The document root has no row of its own.
+   *
+   * A collapsible "{ }" at the top read as an empty object sitting alongside
+   * the real keys, so an object or array root renders its children straight
+   * into the body. A c2 wrapper root keeps a head, because that row carries
+   * the size inputs and the add button, but it gets no caret and never closes.
+   */
+  _buildRoot(data) {
     const wrapper = detectC2Wrapper(data, this.detect);
     if (wrapper)
-      return this._buildWrapperFor(wrapper, ROOT_PATH, {
-        labelText: wrapper.kind === C2_ARRAY ? "c2array" : "c2dictionary",
+      return this.buildContainerNode(wrapper.wrapper, ROOT_PATH, {
+        wrapperKind: wrapper.kind,
+        isRoot: true,
       });
 
-    return this.buildContainerNode(data, ROOT_PATH, {
-      labelText: Array.isArray(data) ? "[ ]" : "{ }",
-    });
+    return this.buildChildren(data, ROOT_PATH, null);
   }
 
   // --------------------------------------------------------- node builders
@@ -659,25 +659,28 @@ export class Editor {
   }
 
   buildContainerNode(value, path, opts = {}) {
-    const { label, labelText, actions, wrapperKind = null } = opts;
+    const { label, labelText, actions, wrapperKind = null, isRoot = false } = opts;
 
-    const node = make("div", "je-node");
+    const node = make("div", isRoot ? "je-node je-root je-open" : "je-node");
     node._jePath = path;
     node._jeWrapperKind = wrapperKind;
     const head = make("div", "je-head");
 
-    let labelNode = label;
-    if (!labelNode) {
-      const text = labelText ?? "";
-      labelNode = make("span", "je-key", text);
-      labelNode.title = text;
-      if (this.isHit(text)) labelNode.classList.add("je-hit");
+    if (!isRoot) {
+      let labelNode = label;
+      if (!labelNode) {
+        const text = labelText ?? "";
+        labelNode = make("span", "je-key", text);
+        labelNode.title = text;
+        if (this.isHit(text)) labelNode.classList.add("je-hit");
+      }
+      head.append(make("span", "je-caret", "▶"), labelNode);
     }
-
-    head.append(make("span", "je-caret", "▶"), labelNode);
     node.append(head);
 
     const setOpen = (open, record = true) => {
+      if (isRoot) return;
+
       if (record) {
         if (open) this.state.expanded.add(path);
         else this.state.expanded.delete(path);
@@ -704,6 +707,11 @@ export class Editor {
       if (!head.querySelector(".je-spacer"))
         head.append(make("span", "je-spacer"));
       head.append(actions);
+    }
+
+    if (isRoot) {
+      node.append(this.buildChildren(value, path, wrapperKind));
+      return node;
     }
 
     head.addEventListener("click", () =>

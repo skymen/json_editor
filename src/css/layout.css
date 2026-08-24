@@ -22,7 +22,10 @@
 .je {
   /* Sizing metrics. A theme may override these; it does not have to. */
   --je-input-w: 12em;
-  --je-actions-w: 4.2em;
+  /* Three buttons at min-width plus their gaps; too narrow and the reorder
+     cluster spills over the value field beside it, which the c2array grid
+     shows first because its columns are fixed. */
+  --je-actions-w: 5.1em;
   --je-gap: 0.3em;
   --je-indent: 0.6em;
 
@@ -140,7 +143,10 @@
 .je-children[hidden] {
   display: none;
 }
-.je > .je-body > .je-node > .je-children {
+/* The root's children are rendered straight into the body, with no node of
+   their own, so they carry no indent or guide line. */
+.je-body > .je-children,
+.je-body > .je-node.je-root > .je-children {
   margin-left: 0;
   padding-left: 0;
   border-left: none;
@@ -228,7 +234,7 @@
 
 .je-btn {
   flex: 0 0 auto;
-  min-width: 1.6em;
+  min-width: 1.5em;
   text-align: center;
 }
 

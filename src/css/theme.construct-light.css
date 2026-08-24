@@ -1,11 +1,10 @@
 /*
  * Construct light - the palette half.
  *
- * The same ramp as theme.construct-dark, read from the other end, which is
- * exactly how C3's own light theme is built: the two files share one ramp and
- * differ only in which steps they pick. The pressed state inverts the other
- * way here - dark fill, near-white text - which is what C3's light theme does
- * for a held button.
+ * The same ramp as theme.construct-dark, read from the other end, and modelled
+ * on the same C3 dialog: body gray29, caption gray31. The pressed state
+ * inverts the other way here - dark fill, near-white text - which is what C3's
+ * light theme does for a held button.
  *
  * The C3 accents are darkened where the originals, tuned for a dark canvas,
  * would be illegible on a light ground.
@@ -17,48 +16,48 @@
   --je-radius-row: 0.17em;
   --je-radius-control: 0.25em;
   --je-radius-tab: 0.6em;
-  --je-radius-panel: 0.35em;
+  --je-radius-panel: 0.5em;
 
   /* Text */
-  --je-fg: #404040; /* gray8 */
-  --je-muted: #5e5e5e; /* gray12, C3's light body text */
-  --je-dim: #808080; /* gray16, the middle of the ramp */
+  --je-fg: #5e5e5e; /* gray12, C3's light dialog and property value text */
+  --je-muted: #5e5e5e; /* gray12, C3's light property name text */
+  --je-dim: #808080; /* gray16 */
   --je-placeholder: #9e9e9e; /* gray20 */
   --je-accent: #1c8e88; /* C3 resize handle teal, the legible end of it */
+  --je-danger: #c1332f; /* C3 invert red, darkened */
 
   /* Surfaces */
-  --je-bg: #f0f0f0; /* gray30, C3's light panel ground */
-  --je-bar-bg: #d6d6d6; /* gray27 */
+  --je-bg: #e8e8e8; /* gray29, C3's light dialog body */
+  --je-bar-bg: #f7f7f7; /* gray31, C3's light dialog caption */
   --je-line: #cfcfcf; /* gray26 */
   --je-hover-bg: #dedede; /* gray28, C3's light tree row hover */
 
   /* Fields */
-  --je-field-bg: #ffffff; /* gray32 */
-  --je-field-bg-hover: #f7f7f7; /* gray31 */
-  --je-field-bg-focus: #f7f7f7; /* gray31 */
+  --je-field-bg: #f7f7f7; /* gray31, C3's light dialog input */
+  --je-field-bg-hover: #ffffff; /* gray32 */
+  --je-field-bg-focus: #ffffff; /* gray32 */
   --je-field-fg-focus: #0f0f0f; /* gray2 */
 
   /* Buttons; the inversion runs the other way in a light theme */
   --je-btn-fg: #5e5e5e; /* gray12 */
-  --je-btn-bg: #e8e8e8; /* gray29 */
-  --je-btn-fg-hover: #404040; /* gray8 */
-  --je-btn-bg-hover: #d6d6d6; /* gray27 */
+  --je-btn-bg: #cfcfcf; /* gray26 */
+  --je-btn-fg-hover: #4f4f4f; /* gray10 */
+  --je-btn-bg-hover: #bfbfbf; /* gray24 */
   --je-press-fg: #f7f7f7; /* gray31, near-white text ... */
-  --je-press-bg: #5e5e5e; /* gray12, ... on a dark fill */
+  --je-press-bg: #4f4f4f; /* gray10, ... on a dark fill */
 
   /* Tabs */
   --je-tab-fg: #4f4f4f; /* gray10 */
   --je-tab-bg: #ffffff; /* gray32 */
+  --je-tab-on-fg: #ffffff;
+  --je-tab-on-bg: #1c8e88; /* the accent */
 
-  --je-add-border: #1f8a44; /* C3 green, darkened */
-  --je-del-border: #c1332f; /* C3 invert red, darkened */
-
-  --je-key: #14706b; /* C3 teal, darkened */
+  --je-key: #5e5e5e; /* gray12, the property value colour */
   --je-key-hit: #000000; /* gray0, so a filter match is unmistakable */
   --je-t-number: #1f8a44; /* C3 green, darkened */
   --je-t-string: #5f7000; /* C3 family yellow, darkened */
   --je-t-keyword: #7a3fbf; /* C3 effect purple, darkened */
 
-  --je-invalid-fg: #b3241f;
-  --je-invalid-bg: #fbdcd7;
+  --je-invalid-fg: #7a1a16;
+  --je-invalid-bg: #f6c9c6;
 }

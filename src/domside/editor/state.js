@@ -7,7 +7,6 @@ export class TabState {
   constructor() {
     this.expanded = new Set();
     this.zSlice = new Map();
-    this.rootOpened = false;
     this.query = "";
     this.scrollTop = 0;
   }
@@ -15,7 +14,6 @@ export class TabState {
   reset() {
     this.expanded.clear();
     this.zSlice.clear();
-    this.rootOpened = false;
     this.query = "";
     this.scrollTop = 0;
   }
