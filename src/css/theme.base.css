@@ -4,10 +4,10 @@
  * variable, so a theme is normally just a block of variable definitions.
  *
  * The built-in themes are this file followed by their variable block. A custom
- * theme can do the same: copy a variable block, change the values, and let the
- * addon supply this file. To restyle more deeply, replace the theme layer
- * outright with the "Set theme CSS" action, or add rules on top with
- * "Append CSS".
+ * theme can do the same: copy a variable block, change the values, and load it
+ * with "Load CSS file" in add-on-top mode, which leaves this file supplying the
+ * rules. Loading in replace mode drops this file instead, for a stylesheet that
+ * describes everything itself.
  *
  * Layout lives in layout.css and is always applied first. Nothing here should
  * set display, flex, grid, width, height, padding or margin.

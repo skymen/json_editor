@@ -1,26 +1,51 @@
 import { id, addonType, properties } from "../../config.caw.js";
 import AddonTypeMap from "../../template/addonTypeMap.js";
 import { SyncEngine } from "./sync.js";
-import { fetchProjectText, isBuiltInTheme } from "./themes.js";
+import { fetchProjectText } from "./themes.js";
 import {
   MSG,
   EVENT,
   COMMAND,
   OP_TRIGGER,
-  STYLE_LAYER,
+  STYLE_MODE,
   defaultConfig,
 } from "../shared/protocol.js";
 import { publicPathKeys } from "../shared/paths.js";
+import {
+  fromCombo,
+  ADD_BUTTON_MODES,
+  THEMES,
+  CSS_MODES,
+  TAB_BAR_MODES,
+  CLOSE_BEHAVIOURS,
+} from "../shared/combos.js";
 
-// Property values arrive as a flat array in declaration order, groups
-// included, so the ids are resolved to positions once rather than counted by
-// hand every time the list changes.
-const PROP = {};
-properties.forEach((prop, index) => {
-  PROP[prop.id] = index;
-});
+const ALL_IDS = properties.map((prop) => prop.id);
+const VALUE_IDS = properties
+  .filter((prop) => prop.type !== "group")
+  .map((prop) => prop.id);
+
+/**
+ * Property values arrive as a flat array, and whether group headers take a slot
+ * in it is not something the addon can safely assume. The length says which it
+ * is, so the values are keyed by id here and every read below is by name.
+ */
+function propsById(values) {
+  const ids = values.length === ALL_IDS.length ? ALL_IDS : VALUE_IDS;
+  const out = {};
+  ids.forEach((propId, index) => {
+    out[propId] = values[index];
+  });
+  return out;
+}
 
 const DEFAULT_TAB = "main";
+
+// A tab reads either a bound object or the project's global variables. Which
+// adapter an object needs is worked out from what the instance supports, so the
+// only distinction a tab has to carry is this one.
+const AUTO = "auto";
+const GLOBALS = "globals";
 
 export default function (parentClass) {
   return class extends parentClass {
@@ -31,13 +56,13 @@ export default function (parentClass) {
       this._tabs = [];
       this._activeTab = DEFAULT_TAB;
 
-      this._theme = "construct-dark";
-      this._customCssFile = "";
-      this._customCssMode = "append";
+      this._theme = THEMES[0];
       this._themeCss = null;
-      this._appendedCss = "";
+      this._customCss = "";
+      this._customCssFile = "";
+      this._customCssMode = CSS_MODES[0];
 
-      this._closeBehaviour = "trigger";
+      this._closeBehaviour = CLOSE_BEHAVIOURS[0];
       this._autoRefresh = true;
       this._refreshInterval = 200;
 
@@ -53,12 +78,13 @@ export default function (parentClass) {
       let className = "";
       let styleAttribute = "";
 
-      const props = this._getInitProperties();
-      if (props) {
+      const values = this._getInitProperties();
+      if (values) {
+        const props = propsById(values);
         this._readProperties(props);
-        elementId = props[PROP["elem-id"]];
-        className = props[PROP["elem-class"]];
-        styleAttribute = props[PROP["style-attribute"]];
+        elementId = props["elem-id"] ?? "";
+        className = props["elem-class"] ?? "";
+        styleAttribute = props["style-attribute"] ?? "";
       }
 
       this._sync = new SyncEngine({
@@ -90,57 +116,61 @@ export default function (parentClass) {
       const config = this._config;
 
       config.permissions = {
-        editValues: props[PROP["allow-edit-values"]],
-        objectKeys: props[PROP["allow-object-keys"]],
-        renameKeys: props[PROP["allow-rename-keys"]],
-        arrayElements: props[PROP["allow-array-elements"]],
-        reorder: props[PROP["allow-reorder"]],
-        resizeC2Array: props[PROP["allow-resize-c2array"]],
-        addButtons: props[PROP["add-buttons"]],
+        editValues: !!props["allow-edit-values"],
+        objectKeys: !!props["allow-object-keys"],
+        renameKeys: !!props["allow-rename-keys"],
+        arrayElements: !!props["allow-array-elements"],
+        reorder: !!props["allow-reorder"],
+        resizeC2Array: !!props["allow-resize-c2array"],
+        addButtons: fromCombo(ADD_BUTTON_MODES, props["add-buttons"], "value-array"),
       };
 
       config.detect = {
-        c2array: props[PROP["detect-c2array"]],
-        c2arrayString: props[PROP["detect-c2array-string"]],
-        c2dictionary: props[PROP["detect-c2dictionary"]],
-        c2dictionaryString: props[PROP["detect-c2dictionary-string"]],
-        c2ArrayDims: props[PROP["show-c2array-dims"]],
-        c2ArrayZBar: props[PROP["show-c2array-zbar"]],
+        c2array: !!props["detect-c2array"],
+        c2arrayString: !!props["detect-c2array-string"],
+        c2dictionary: !!props["detect-c2dictionary"],
+        c2dictionaryString: !!props["detect-c2dictionary-string"],
+        c2ArrayDims: !!props["show-c2array-dims"],
+        c2ArrayZBar: !!props["show-c2array-zbar"],
       };
 
       config.chrome = {
-        tabBar: props[PROP["tab-bar"]],
-        filter: props[PROP["show-filter"]],
-        collapseAll: props[PROP["show-collapse-all"]],
-        close: props[PROP["show-close"]],
+        tabBar: fromCombo(TAB_BAR_MODES, props["tab-bar"]),
+        filter: !!props["show-filter"],
+        collapseAll: !!props["show-collapse-all"],
+        close: !!props["show-close"],
       };
 
       config.tuning = {
-        uiScale: props[PROP["ui-scale"]],
-        longValueChars: props[PROP["long-value-chars"]],
-        commitDebounce: props[PROP["commit-debounce"]],
-        pressFreeze: props[PROP["press-freeze"]],
-        blockInput: props[PROP["block-input"]],
-        overrideCursor: props[PROP["override-cursor"]],
+        uiScale: Number(props["ui-scale"]) || 0.6,
+        longValueChars: Number(props["long-value-chars"]) || 40,
+        commitDebounce: Math.max(0, Number(props["commit-debounce"]) || 0),
+        pressFreeze: Math.max(0, Number(props["press-freeze"]) || 0),
+        blockInput: !!props["block-input"],
+        overrideCursor: !!props["override-cursor"],
       };
 
-      this._theme = props[PROP["theme"]];
-      this._customCssFile = props[PROP["custom-css"]] ?? "";
-      this._customCssMode = props[PROP["custom-css-mode"]];
-      this._closeBehaviour = props[PROP["close-behaviour"]];
-      this._autoRefresh = props[PROP["auto-refresh"]];
-      this._refreshInterval = props[PROP["refresh-interval"]];
+      this._theme = fromCombo(THEMES, props["theme"]);
+      this._customCssFile = asFilename(props["custom-css"]);
+      this._customCssMode = fromCombo(CSS_MODES, props["custom-css-mode"]);
+      this._closeBehaviour = fromCombo(CLOSE_BEHAVIOURS, props["close-behaviour"]);
+      this._autoRefresh = !!props["auto-refresh"];
+      this._refreshInterval = Math.max(0, Number(props["refresh-interval"]) || 0);
 
-      // The property-driven binding is the first tab. Actions can add more.
-      this._tabs = [
-        {
-          id: DEFAULT_TAB,
-          label: "Data",
-          kind: props[PROP["source-kind"]],
-          uid: -1,
-          objectName: props[PROP["source-object"]]?.name ?? "",
-        },
-      ];
+      // Only bind a tab when the properties actually name something to edit. An
+      // unbound placeholder tab would show up in the tab bar and count towards
+      // it, which is exactly what "hide when single" is there to avoid.
+      if (props["edit-globals"]) {
+        this._tabs = [makeTab(DEFAULT_TAB, "Globals", GLOBALS)];
+        return;
+      }
+
+      const objectName = props["source-object"]?.name ?? "";
+      if (!objectName) return;
+
+      const tab = makeTab(DEFAULT_TAB, objectName, AUTO);
+      tab.objectName = objectName;
+      this._tabs = [tab];
     }
 
     // -------------------------------------------------------------- element
@@ -154,8 +184,8 @@ export default function (parentClass) {
 
     _styleState() {
       if (this._themeCss !== null)
-        return { layer: STYLE_LAYER.THEME, css: this._themeCss };
-      return { layer: STYLE_LAYER.THEME, theme: this._theme };
+        return { mode: STYLE_MODE.REPLACE, css: this._themeCss };
+      return { mode: STYLE_MODE.THEME, theme: this._theme };
     }
 
     _pushConfig() {
@@ -261,8 +291,23 @@ export default function (parentClass) {
       return this._tabs.find((t) => t.id === tabId) ?? null;
     }
 
+    /**
+     * The source actions work without a tab having been set up first, so the
+     * default tab is created on demand rather than sitting there empty from the
+     * start.
+     */
+    _ensureTab(tabId) {
+      const existing = this._tabById(tabId);
+      if (existing) return existing;
+
+      const tab = makeTab(tabId, tabId === DEFAULT_TAB ? "Data" : tabId, AUTO);
+      this._tabs.push(tab);
+      this._postTabs();
+      return tab;
+    }
+
     _instanceFor(tab) {
-      if (!tab || tab.kind === "globals") return null;
+      if (!tab || tab.kind === GLOBALS) return null;
 
       if (tab.uid > 0) {
         const inst = this.runtime.getInstanceByUid(tab.uid);
@@ -275,40 +320,43 @@ export default function (parentClass) {
     }
 
     _postTabs() {
+      if (this._tabs.length && !this._tabById(this._activeTab))
+        this._activeTab = this._tabs[0].id;
+
       this._postToDOMElement(MSG.TABS, {
         tabs: this._tabs.map((t) => ({ id: t.id, label: t.label })),
         activeId: this._activeTab,
       });
     }
 
+    _rebind(tab) {
+      this._sync.invalidate(tab.id);
+      this._sync.poll();
+    }
+
     // ------------------------------------------------- source, exposed to ACEs
 
-    setSourceObject(objectParam, tabId = this._activeTab) {
-      const tab = this._tabById(tabId);
-      if (!tab) return;
-
+    setSourceObject(objectParam, tabId) {
+      const tab = this._ensureTab(tabId || this._activeTab || DEFAULT_TAB);
+      tab.kind = AUTO;
       Object.assign(tab, describeObject(objectParam));
-      this._sync.invalidate(tab.id);
-      this._sync.poll();
+      this._rebind(tab);
     }
 
-    setSourceUID(uid, tabId = this._activeTab) {
-      const tab = this._tabById(tabId);
-      if (!tab) return;
-
+    setSourceUID(uid, tabId) {
+      const tab = this._ensureTab(tabId || this._activeTab || DEFAULT_TAB);
+      tab.kind = AUTO;
       tab.uid = Number(uid) || -1;
       tab.objectName = "";
-      this._sync.invalidate(tab.id);
-      this._sync.poll();
+      this._rebind(tab);
     }
 
-    setSourceKind(kind, tabId = this._activeTab) {
-      const tab = this._tabById(tabId);
-      if (!tab) return;
-
-      tab.kind = kind;
-      this._sync.invalidate(tab.id);
-      this._sync.poll();
+    setSourceToGlobals(tabId) {
+      const tab = this._ensureTab(tabId || this._activeTab || DEFAULT_TAB);
+      tab.kind = GLOBALS;
+      tab.uid = -1;
+      tab.objectName = "";
+      this._rebind(tab);
     }
 
     refresh() {
@@ -324,19 +372,26 @@ export default function (parentClass) {
       this._refreshInterval = Math.max(0, Number(ms) || 0);
     }
 
-    addTab(tabId, label, kind, objectParam) {
+    addTab(tabId, label, objectParam) {
+      this._addTab(tabId, label, AUTO, describeObject(objectParam));
+    }
+
+    addGlobalsTab(tabId, label) {
+      this._addTab(tabId, label, GLOBALS, { uid: -1, objectName: "" });
+    }
+
+    _addTab(tabId, label, kind, binding) {
       if (!tabId) return;
 
       const existing = this._tabById(tabId);
-      const tab = existing ?? { id: tabId };
+      const tab = existing ?? makeTab(tabId, label, kind);
       tab.label = label || tabId;
-      tab.kind = kind || "auto";
-      Object.assign(tab, describeObject(objectParam));
+      tab.kind = kind;
+      Object.assign(tab, binding);
 
       if (!existing) this._tabs.push(tab);
       this._postTabs();
-      this._sync.invalidate(tabId);
-      this._sync.poll();
+      this._rebind(tab);
     }
 
     removeTab(tabId) {
@@ -345,8 +400,6 @@ export default function (parentClass) {
 
       this._tabs.splice(index, 1);
       this._sync.forget(tabId);
-      if (this._activeTab === tabId)
-        this._activeTab = this._tabs[0]?.id ?? DEFAULT_TAB;
       this._postTabs();
     }
 
@@ -363,50 +416,54 @@ export default function (parentClass) {
       this._command(COMMAND.SELECT_TAB, { tabId });
     }
 
-    // ---------------------------------------------- appearance, exposed to ACEs
+    // ------------------------------------------------ theme, exposed to ACEs
 
+    /** Switch to a built-in theme, dropping any CSS loaded on top of it. */
     setTheme(name) {
-      if (!isBuiltInTheme(name)) return;
-      this._theme = name;
+      this._theme = fromCombo(THEMES, name);
       this._themeCss = null;
-      this._pushStyle({ layer: STYLE_LAYER.THEME, theme: name });
-    }
-
-    setThemeCss(css) {
-      this._themeCss = String(css ?? "");
-      this._pushStyle({ layer: STYLE_LAYER.THEME, css: this._themeCss });
+      this._customCss = "";
+      this._pushStyle({ mode: STYLE_MODE.THEME, theme: this._theme });
     }
 
     /**
-     * Load a CSS file from the project's Files folder.
+     * Apply CSS supplied by the project.
      *
-     * "append" stacks it on the current theme, so a file only has to override
-     * the --je-* variables it cares about. "replace" drops the theme layer
-     * entirely, for a stylesheet that describes everything itself. Layout is
-     * applied first either way and is never affected.
+     * "append" stacks it on the current theme, so a stylesheet only has to
+     * override the --je-* variables it cares about, and several can be layered.
+     * "replace" makes it the theme, so nothing but the layout layer remains.
      */
-    async loadCssFile(filename, mode = this._customCssMode) {
-      const css = await fetchProjectText(this.runtime, filename);
+    applyCss(css, mode) {
+      const text = String(css ?? "");
+      const resolved = fromCombo(CSS_MODES, mode);
+
+      if (resolved === "replace") {
+        this._themeCss = text;
+        this._customCss = "";
+      } else {
+        this._customCss = this._customCss ? `${this._customCss}\n${text}` : text;
+      }
+
+      this._pushStyle({ mode: resolved, css: text });
+    }
+
+    async loadCssFile(filename, mode) {
+      const name = asFilename(filename);
+      if (!name) return;
+
+      const css = await fetchProjectText(this.runtime, name);
       if (css === null) return;
 
-      this._customCssFile = filename;
-      if (mode === "replace") this.setThemeCss(css);
-      else this.appendCss(css);
-    }
-
-    appendCss(css) {
-      this._appendedCss = String(css ?? "");
-      this._pushStyle({ layer: STYLE_LAYER.APPEND, css: this._appendedCss });
-    }
-
-    clearAppendedCss() {
-      this.appendCss("");
+      this._customCssFile = name;
+      this.applyCss(css, mode);
     }
 
     async _loadCustomCssFromProperty() {
       if (!this._customCssFile) return;
       await this.loadCssFile(this._customCssFile, this._customCssMode);
     }
+
+    // -------------------------------------------- top bar, exposed to ACEs
 
     setUiScale(scale) {
       this._config.tuning.uiScale = Math.max(0.05, Number(scale) || 0.05);
@@ -420,7 +477,7 @@ export default function (parentClass) {
     }
 
     setAddButtons(mode) {
-      this._config.permissions.addButtons = mode;
+      this._config.permissions.addButtons = fromCombo(ADD_BUTTON_MODES, mode);
       this._pushConfig();
     }
 
@@ -431,6 +488,11 @@ export default function (parentClass) {
       this._pushConfig();
     }
 
+    setTabBar(mode) {
+      this._config.chrome.tabBar = fromCombo(TAB_BAR_MODES, mode);
+      this._pushConfig();
+    }
+
     setChrome(name, value) {
       if (!(name in this._config.chrome)) return;
       this._config.chrome[name] = value;
@@ -438,10 +500,10 @@ export default function (parentClass) {
     }
 
     setCloseBehaviour(mode) {
-      this._closeBehaviour = mode;
+      this._closeBehaviour = fromCombo(CLOSE_BEHAVIOURS, mode);
     }
 
-    // ---------------------------------------------- navigation, exposed to ACEs
+    // --------------------------------------------- navigation, exposed to ACEs
 
     setFilterText(text) {
       this._filterText = String(text ?? "");
@@ -540,7 +602,12 @@ export default function (parentClass) {
           title: "JSON Editor",
           properties: [
             { name: "Current tab", value: this._activeTab },
-            { name: "Tabs", value: this._tabs.map((t) => t.id).join(", ") },
+            {
+              name: "Tabs",
+              value:
+                this._tabs.map((t) => `${t.id}:${t.kind}`).join(", ") ||
+                "(none)",
+            },
             { name: "Theme", value: this.themeName },
             { name: "Last path", value: this._lastPath },
             {
@@ -559,7 +626,7 @@ export default function (parentClass) {
         activeTab: this._activeTab,
         theme: this._theme,
         themeCss: this._themeCss,
-        appendedCss: this._appendedCss,
+        customCss: this._customCss,
         viewState: this._viewState,
       };
     }
@@ -569,13 +636,14 @@ export default function (parentClass) {
       this._activeTab = o["activeTab"] ?? DEFAULT_TAB;
       this._theme = o["theme"] ?? this._theme;
       this._themeCss = o["themeCss"] ?? null;
-      this._appendedCss = o["appendedCss"] ?? "";
+      this._customCss = o["customCss"] ?? "";
       this._viewState = o["viewState"] ?? null;
 
       this._postTabs();
+
       this._pushStyle(this._styleState());
-      if (this._appendedCss)
-        this._pushStyle({ layer: STYLE_LAYER.APPEND, css: this._appendedCss });
+      if (this._customCss)
+        this._pushStyle({ mode: STYLE_MODE.APPEND, css: this._customCss });
 
       this._sync.invalidate();
       this._sync.poll();
@@ -584,6 +652,15 @@ export default function (parentClass) {
       if (this._viewState) this._command(COMMAND.RESTORE_VIEW, this._viewState);
     }
   };
+}
+
+function makeTab(tabId, label, kind) {
+  return { id: tabId, label: label || tabId, kind, uid: -1, objectName: "" };
+}
+
+/** A project file property is only usable when it actually names a file. */
+function asFilename(value) {
+  return typeof value === "string" ? value.trim() : "";
 }
 
 /**
@@ -598,6 +675,13 @@ function describeObject(objectParam) {
   if (typeof objectParam === "number")
     return { uid: objectParam, objectName: "" };
 
+  // An instance rather than an object type.
+  if (typeof objectParam.uid === "number")
+    return {
+      uid: objectParam.uid,
+      objectName: objectParam.objectType?.name ?? "",
+    };
+
   const objectName = objectParam.name ?? "";
 
   let inst = null;
@@ -605,9 +689,6 @@ function describeObject(objectParam) {
     inst = objectParam.getFirstPickedInstance();
   if (!inst && typeof objectParam.getFirstInstance === "function")
     inst = objectParam.getFirstInstance();
-
-  if (!inst && typeof objectParam.uid === "number")
-    return { uid: objectParam.uid, objectName };
 
   return { uid: inst?.uid ?? -1, objectName };
 }

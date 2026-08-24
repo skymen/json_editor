@@ -5,6 +5,13 @@ import {
   PROPERTY_TYPE,
 } from "./template/enums.js";
 import _version from "./version.js";
+import {
+  ADD_BUTTON_ITEMS,
+  THEME_ITEMS,
+  CSS_MODE_ITEMS,
+  TAB_BAR_ITEMS,
+  CLOSE_BEHAVIOUR_ITEMS,
+} from "./src/shared/combos.js";
 
 export const addonType = ADDON_TYPE.PLUGIN;
 export const type = PLUGIN_TYPE.DOM;
@@ -36,8 +43,9 @@ export const files = {
 export const aceCategories = {
   source: "Source",
   tabs: "Tabs",
-  appearance: "Appearance",
-  editing: "Editing",
+  theme: "Theme",
+  "config-top-bar": "Config: top bar",
+  "config-editing": "Config: editing",
   navigation: "Navigation",
   events: "Events",
 };
@@ -89,24 +97,14 @@ export const properties = [
       allowedPluginIds: ["Json", "Dictionary", "Arr"],
     },
     name: "Source object",
-    desc: "The JSON, Dictionary or Array object to edit. Leave empty to bind from events instead.",
+    desc: "The JSON, Dictionary or Array object to edit; how to read it is worked out from its type. Leave empty to bind from events instead.",
   },
   {
-    type: PROPERTY_TYPE.COMBO,
-    id: "source-kind",
-    options: {
-      initialValue: "auto",
-      items: [
-        { auto: "Auto-detect" },
-        { json: "JSON" },
-        { dictionary: "Dictionary" },
-        { array: "Array" },
-        { globals: "Global variables" },
-        { none: "None" },
-      ],
-    },
-    name: "Source kind",
-    desc: "How to read the source object. Auto-detect picks by what the bound object supports.",
+    type: PROPERTY_TYPE.CHECK,
+    id: "edit-globals",
+    options: { initialValue: false },
+    name: "Edit global variables",
+    desc: "Edit the project's global variables instead of an object. The source object is ignored when this is on.",
   },
   {
     type: PROPERTY_TYPE.CHECK,
@@ -178,11 +176,7 @@ export const properties = [
     id: "add-buttons",
     options: {
       initialValue: "value-array",
-      items: [
-        { value: "Value only" },
-        { "value-array": "Value and array" },
-        { "value-object-array": "Value, object and array" },
-      ],
+      items: ADD_BUTTON_ITEMS,
     },
     name: "Add buttons",
     desc: "Which kinds of new entry the add bar offers.",
@@ -239,24 +233,20 @@ export const properties = [
     desc: "Show the z plane selector when a c2array is more than one plane deep.",
   },
 
-  // ------------------------------------------------------------ Appearance
+  // ----------------------------------------------------------------- Theme
   {
     type: PROPERTY_TYPE.GROUP,
-    id: "group-appearance",
+    id: "group-theme",
     options: {},
-    name: "Appearance",
-    desc: "Theme and visible chrome.",
+    name: "Theme",
+    desc: "How the editor is styled. Layout is fixed; a theme only describes colour.",
   },
   {
     type: PROPERTY_TYPE.COMBO,
     id: "theme",
     options: {
       initialValue: "construct-dark",
-      items: [
-        { "construct-dark": "Construct dark" },
-        { "construct-light": "Construct light" },
-        { bare: "Bare (layout only)" },
-      ],
+      items: THEME_ITEMS,
     },
     name: "Theme",
     desc: "Which built-in theme to start with.",
@@ -273,13 +263,19 @@ export const properties = [
     id: "custom-css-mode",
     options: {
       initialValue: "append",
-      items: [
-        { append: "Add on top of the theme" },
-        { replace: "Replace the theme" },
-      ],
+      items: CSS_MODE_ITEMS,
     },
     name: "Custom CSS mode",
     desc: "Whether the custom CSS file adds to the built-in theme, so it only has to override what it wants, or replaces it outright.",
+  },
+
+  // --------------------------------------------------------------- Top bar
+  {
+    type: PROPERTY_TYPE.GROUP,
+    id: "group-top-bar",
+    options: {},
+    name: "Top bar",
+    desc: "Which controls the editor shows, and what closing it does.",
   },
   {
     type: PROPERTY_TYPE.FLOAT,
@@ -293,11 +289,7 @@ export const properties = [
     id: "tab-bar",
     options: {
       initialValue: "auto",
-      items: [
-        { auto: "Auto (hide when single)" },
-        { always: "Always" },
-        { never: "Never" },
-      ],
+      items: TAB_BAR_ITEMS,
     },
     name: "Tab bar",
     desc: "When to show the tab bar.",
@@ -328,11 +320,7 @@ export const properties = [
     id: "close-behaviour",
     options: {
       initialValue: "trigger",
-      items: [
-        { trigger: "Trigger only" },
-        { hide: "Hide" },
-        { destroy: "Destroy" },
-      ],
+      items: CLOSE_BEHAVIOUR_ITEMS,
     },
     name: "Close behaviour",
     desc: "What the close button does after flushing pending edits. On close clicked fires either way.",

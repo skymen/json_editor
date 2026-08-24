@@ -1,46 +1,57 @@
 /*
- * Construct light. Variables only - the descriptive rules live in
- * theme.base.css, which the addon applies ahead of this block.
+ * Construct light.
+ *
+ * The same C3 grey ramp as theme.construct-dark, read from the other end, which
+ * is exactly how Construct's own two themes relate to each other: the ramp is
+ * identical in both files and only the steps chosen differ.
+ *
+ * The accents are the same C3 colours, darkened where the originals would be
+ * illegible on a light ground - C3's selection teal and family yellow are tuned
+ * for a dark canvas and cannot be used unchanged here.
+ *
+ * Variables only; the descriptive rules live in theme.base.css, which the addon
+ * applies ahead of this block.
  */
 
 .je {
-  --je-fg: #1f2328;
-  --je-muted: #626b75;
-  --je-dim: #7b848e;
-  --je-placeholder: #9aa2ab;
-  --je-accent: #1a73e8;
+  --je-fg: #404040; /* gray8; C3 uses gray12 for body text, a step darker reads
+                       better at the editor's smaller size */
+  --je-muted: #5e5e5e; /* gray12, C3's light body text */
+  --je-dim: #808080; /* gray16, the middle of the ramp */
+  --je-placeholder: #9e9e9e; /* gray20 */
+  --je-accent: #1c8e88; /* C3 resize handle teal, the legible end of it */
 
-  --je-bg: #f4f5f7;
-  --je-bar-bg: #e6e8eb;
-  --je-outline: #c4c8cd;
-  --je-line: #d3d7dc;
-  --je-hover-bg: rgba(0, 0, 0, 0.06);
+  --je-bg: #f0f0f0; /* gray30 */
+  --je-bar-bg: #d6d6d6; /* gray27, C3's light panel ground */
+  --je-outline: #bfbfbf; /* gray24 */
+  --je-line: #cfcfcf; /* gray26 */
+  --je-hover-bg: #dedede; /* gray28 */
 
-  --je-field-bg: #ffffff;
-  --je-field-bg-focus: #ffffff;
-  --je-field-border: #bcc2c9;
+  --je-field-bg: #ffffff; /* gray32 */
+  --je-field-bg-focus: #ffffff; /* gray32 */
+  --je-field-border: #bfbfbf; /* gray24 */
 
-  --je-btn-bg: #e0e3e7;
-  --je-btn-bg-hover: #d0d5db;
-  --je-btn-bg-disabled: #eaecef;
-  --je-btn-border: #b8bec5;
+  --je-btn-bg: #e8e8e8; /* gray29 */
+  --je-btn-bg-hover: #cfcfcf; /* gray26 */
+  --je-btn-bg-disabled: #f7f7f7; /* gray31 */
+  --je-btn-border: #bfbfbf; /* gray24 */
 
-  --je-add-bg: #bfe3c8;
-  --je-add-border: #3f9d5b;
-  --je-del-bg: #f3c7c9;
-  --je-del-border: #c0454c;
+  --je-add-bg: rgba(47, 204, 99, 0.28); /* C3 project-item green as a tint */
+  --je-add-border: #1f8a44;
+  --je-del-bg: rgba(248, 87, 83, 0.28); /* C3 invert red as a tint */
+  --je-del-border: #c1332f;
 
-  --je-tab-on-bg: #cfe0f7;
-  --je-tab-on-bg-hover: #bcd5f4;
-  --je-tab-on-fg: #12325c;
+  --je-tab-on-bg: rgba(41, 243, 208, 0.45); /* C3 selection teal as a tint */
+  --je-tab-on-bg-hover: rgba(41, 243, 208, 0.65);
+  --je-tab-on-fg: #1f1f1f; /* gray4 */
 
-  --je-key: #1a5fb4;
-  --je-key-hit: #a15c00;
-  --je-t-number: #2e7d32;
-  --je-t-string: #b35309;
-  --je-t-keyword: #7b1fa2;
+  --je-key: #14706b; /* C3 teal, darkened */
+  --je-key-hit: #000000; /* gray0, so a filter match is unmistakable */
+  --je-t-number: #1f8a44; /* C3 green, darkened */
+  --je-t-string: #5f7000; /* C3 family yellow, darkened */
+  --je-t-keyword: #7a3fbf; /* C3 effect purple, darkened */
 
-  --je-invalid-fg: #a3231b;
-  --je-invalid-bg: #fbdedc;
-  --je-invalid-border: #d0413b;
+  --je-invalid-fg: #b3241f;
+  --je-invalid-bg: rgba(248, 87, 83, 0.18);
+  --je-invalid-border: #f85753;
 }

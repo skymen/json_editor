@@ -2,13 +2,15 @@
  * Example custom theme for the JSON Editor plugin.
  *
  * Put a copy of this in the project's Files folder, name it in the editor's
- * "Custom CSS" property, and leave "Custom CSS mode" on "Add on top of the
- * theme". Everything below is a variable override, so the built-in theme keeps
+ * "Custom CSS" property, and leave "Custom CSS mode" on "Add on top of what is
+ * there". Everything below is a variable override, so the built-in theme keeps
  * supplying the actual rules and this file only has to say what is different.
+ * The "Load CSS file" and "Load CSS string" actions do the same at runtime.
  *
- * To describe the rules yourself instead, switch the mode to "Replace the
- * theme" and write ordinary CSS against the class names listed at the bottom.
- * Layout is applied first either way and is never affected by a theme.
+ * To describe the rules yourself instead, switch the mode to "Replace
+ * everything but the layout" and write ordinary CSS against the class names
+ * listed at the bottom. Layout is applied first either way and is never
+ * affected.
  */
 
 .je {

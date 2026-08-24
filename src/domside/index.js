@@ -5,7 +5,7 @@
 // above it. This class is only the seam.
 
 import { Editor } from "./editor/Editor.js";
-import { MSG, STYLE_LAYER } from "../shared/protocol.js";
+import { MSG, STYLE_MODE } from "../shared/protocol.js";
 
 export default function (parentClass) {
   return class extends parentClass {
@@ -94,11 +94,10 @@ export default function (parentClass) {
 function applyStyle(editor, style) {
   if (!style) return;
 
-  if (style["layer"] === STYLE_LAYER.APPEND) {
-    editor.setAppendedCss(style["css"] ?? "");
+  if (style["mode"] === STYLE_MODE.THEME) {
+    editor.setTheme(style["theme"]);
     return;
   }
 
-  if (typeof style["css"] === "string") editor.setThemeCss(style["css"]);
-  else if (style["theme"]) editor.setTheme(style["theme"]);
+  editor.applyCss(style["css"] ?? "", style["mode"]);
 }

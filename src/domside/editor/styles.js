@@ -1,10 +1,14 @@
 // Style layers inside the shadow root.
 //
-//   layout   structure. Always applied, never replaced.
-//   theme    colour and border. Swapped by name, by project file, or by
-//            a string pushed from an action.
-//   append   extra rules stacked on top of whichever theme is active, so a
-//            built-in theme can be tweaked instead of rewritten.
+//   layout   structure. Always applied, never replaced by anything.
+//   theme    colour and border. A built-in theme, or CSS that replaced it.
+//   custom   CSS stacked on top of the theme.
+//
+// Three ways in, and that is the whole surface:
+//
+//   setTheme(name)          built-in theme, custom layer cleared
+//   applyCss(css, append)   stacked on top of whatever is there
+//   applyCss(css, replace)  becomes the theme, custom layer cleared
 //
 // Plain <style> nodes rather than adoptedStyleSheets: constructable
 // stylesheets only reached Safari in 16.4, and swapping textContent costs
@@ -30,39 +34,43 @@ export function builtInThemeCss(name) {
   return BUILT_IN_THEMES[name] ?? BUILT_IN_THEMES[DEFAULT_THEME];
 }
 
-export function isBuiltInTheme(name) {
-  return Object.prototype.hasOwnProperty.call(BUILT_IN_THEMES, name);
-}
-
 export class StyleLayers {
   constructor(root) {
     this._layout = document.createElement("style");
     this._theme = document.createElement("style");
-    this._append = document.createElement("style");
+    this._custom = document.createElement("style");
 
     this._layout.textContent = layoutCss;
     this._theme.textContent = builtInThemeCss(DEFAULT_THEME);
 
-    // Order is the cascade: layout, then theme, then user additions.
-    root.append(this._layout, this._theme, this._append);
+    // Order is the cascade: layout, then theme, then anything added on top.
+    root.append(this._layout, this._theme, this._custom);
   }
 
-  /** Replace the theme layer with one of the built-ins. */
+  /** Switch to a built-in theme, dropping any CSS added on top of it. */
   setTheme(name) {
     this._theme.textContent = builtInThemeCss(name);
+    this._custom.textContent = "";
   }
 
-  /** Replace the theme layer with arbitrary CSS. */
-  setThemeCss(css) {
-    this._theme.textContent = css ?? "";
-  }
+  /**
+   * Apply CSS supplied by the project.
+   *
+   * "append" stacks it on the current theme, so a stylesheet only has to
+   * override the --je-* variables it cares about, and several can be layered.
+   * "replace" makes it the theme, so nothing but the layout layer remains.
+   */
+  applyCss(css, mode) {
+    const text = css ?? "";
 
-  /** Stack rules on top of the current theme. */
-  setAppendedCss(css) {
-    this._append.textContent = css ?? "";
-  }
+    if (mode === "replace") {
+      this._theme.textContent = text;
+      this._custom.textContent = "";
+      return;
+    }
 
-  clearAppendedCss() {
-    this._append.textContent = "";
+    this._custom.textContent = this._custom.textContent
+      ? `${this._custom.textContent}\n${text}`
+      : text;
   }
 }

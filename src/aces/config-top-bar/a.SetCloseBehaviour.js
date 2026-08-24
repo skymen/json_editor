@@ -1,3 +1,5 @@
+import { CLOSE_BEHAVIOUR_ITEMS } from "../../shared/combos.js";
+
 export const config = {
   id: "set-close-behaviour",
   listName: "Set close behaviour",
@@ -12,11 +14,7 @@ export const config = {
       desc: "What happens when the close button is clicked.",
       type: "combo",
       initialValue: "trigger",
-      items: [
-        { trigger: "Trigger only" },
-        { hide: "Hide" },
-        { destroy: "Destroy" },
-      ],
+      items: CLOSE_BEHAVIOUR_ITEMS,
     },
   ],
 };

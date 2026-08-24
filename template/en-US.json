@@ -8,11 +8,12 @@
         "description": "An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.",
         "help-url": "https://www.construct.net",
         "aceCategories": {
-          "appearance": "Appearance",
-          "editing": "Editing",
+          "config-editing": "Config: editing",
+          "config-top-bar": "Config: top bar",
           "navigation": "Navigation",
           "source": "Source",
           "tabs": "Tabs",
+          "theme": "Theme",
           "events": "Events"
         },
         "properties": {
@@ -22,19 +23,11 @@
           },
           "source-object": {
             "name": "Source object",
-            "desc": "The JSON, Dictionary or Array object to edit. Leave empty to bind from events instead."
+            "desc": "The JSON, Dictionary or Array object to edit; how to read it is worked out from its type. Leave empty to bind from events instead."
           },
-          "source-kind": {
-            "name": "Source kind",
-            "desc": "How to read the source object. Auto-detect picks by what the bound object supports.",
-            "items": {
-              "auto": "Auto-detect",
-              "json": "JSON",
-              "dictionary": "Dictionary",
-              "array": "Array",
-              "globals": "Global variables",
-              "none": "None"
-            }
+          "edit-globals": {
+            "name": "Edit global variables",
+            "desc": "Edit the project's global variables instead of an object. The source object is ignored when this is on."
           },
           "auto-refresh": {
             "name": "Auto refresh",
@@ -109,9 +102,9 @@
             "name": "Show c2array z plane bar",
             "desc": "Show the z plane selector when a c2array is more than one plane deep."
           },
-          "group-appearance": {
-            "name": "Appearance",
-            "desc": "Theme and visible chrome."
+          "group-theme": {
+            "name": "Theme",
+            "desc": "How the editor is styled. Layout is fixed; a theme only describes colour."
           },
           "theme": {
             "name": "Theme",
@@ -130,9 +123,13 @@
             "name": "Custom CSS mode",
             "desc": "Whether the custom CSS file adds to the built-in theme, so it only has to override what it wants, or replaces it outright.",
             "items": {
-              "append": "Add on top of the theme",
-              "replace": "Replace the theme"
+              "append": "Add on top of what is there",
+              "replace": "Replace everything but the layout"
             }
+          },
+          "group-top-bar": {
+            "name": "Top bar",
+            "desc": "Which controls the editor shows, and what closing it does."
           },
           "ui-scale": {
             "name": "UI scale",
@@ -206,145 +203,6 @@
           }
         },
         "actions": {
-          "append-css": {
-            "list-name": "Append CSS",
-            "display-text": "Append CSS [i]{0}[/i]",
-            "description": "Stack extra rules on top of the current theme, so a built-in theme can be tweaked rather than rewritten. Replaces anything appended before.",
-            "params": {
-              "css": {
-                "name": "CSS",
-                "desc": "The rules to apply on top of the theme."
-              }
-            }
-          },
-          "clear-appended-css": {
-            "list-name": "Clear appended CSS",
-            "display-text": "Clear appended CSS",
-            "description": "Remove the rules added by Append CSS, leaving the theme alone.",
-            "params": {}
-          },
-          "load-css-from-file": {
-            "list-name": "Load CSS from file",
-            "display-text": "Load CSS from file [b]{0}[/b] ({1})",
-            "description": "Load a .css file from the project's Files folder, either on top of the current theme or in place of it.",
-            "params": {
-              "filename": {
-                "name": "File",
-                "desc": "The name of a .css file in the project's Files folder."
-              },
-              "mode": {
-                "name": "Mode",
-                "desc": "Whether the file adds to the current theme or replaces it.",
-                "items": {
-                  "append": "Add on top of the theme",
-                  "replace": "Replace the theme"
-                }
-              }
-            }
-          },
-          "set-close-behaviour": {
-            "list-name": "Set close behaviour",
-            "display-text": "Set close behaviour to [b]{0}[/b]",
-            "description": "What the close button does after flushing pending edits. On close clicked fires either way.",
-            "params": {
-              "mode": {
-                "name": "Behaviour",
-                "desc": "What happens when the close button is clicked.",
-                "items": {
-                  "trigger": "Trigger only",
-                  "hide": "Hide",
-                  "destroy": "Destroy"
-                }
-              }
-            }
-          },
-          "set-tab-bar": {
-            "list-name": "Set tab bar",
-            "display-text": "Set tab bar to [b]{0}[/b]",
-            "description": "When the tab bar should be shown.",
-            "params": {
-              "mode": {
-                "name": "Mode",
-                "desc": "When to show the tab bar.",
-                "items": {
-                  "auto": "Auto (hide when single)",
-                  "always": "Always",
-                  "never": "Never"
-                }
-              }
-            }
-          },
-          "set-theme": {
-            "list-name": "Set theme",
-            "display-text": "Set theme to [b]{0}[/b]",
-            "description": "Switch to one of the built-in themes.",
-            "params": {
-              "theme": {
-                "name": "Theme",
-                "desc": "The built-in theme to apply.",
-                "items": {
-                  "construct-dark": "Construct dark",
-                  "construct-light": "Construct light",
-                  "bare": "Bare (layout only)"
-                }
-              }
-            }
-          },
-          "set-theme-css": {
-            "list-name": "Set theme CSS",
-            "display-text": "Set theme CSS to [i]{0}[/i]",
-            "description": "Replace the theme layer with CSS supplied directly. Layout rules are applied first and are not affected.",
-            "params": {
-              "css": {
-                "name": "CSS",
-                "desc": "The stylesheet to use as the theme layer."
-              }
-            }
-          },
-          "set-ui-scale": {
-            "list-name": "Set UI scale",
-            "display-text": "Set UI scale to [b]{0}[/b]",
-            "description": "Multiply the base font size the whole editor is laid out in. Everything is sized in em, so this scales the tree as a whole.",
-            "params": {
-              "scale": {
-                "name": "Scale",
-                "desc": "The scale factor. 1 is the page's own font size."
-              }
-            }
-          },
-          "show-close-button": {
-            "list-name": "Show close button",
-            "display-text": "Set the close button [b]{0}[/b]",
-            "description": "Whether a close button is shown in the tab bar.",
-            "params": {
-              "enabled": {
-                "name": "Visible",
-                "desc": "Whether a close button is shown in the tab bar."
-              }
-            }
-          },
-          "show-collapse-all": {
-            "list-name": "Show collapse all",
-            "display-text": "Set the Collapse all button [b]{0}[/b]",
-            "description": "Whether the Collapse all button is shown in the toolbar.",
-            "params": {
-              "enabled": {
-                "name": "Visible",
-                "desc": "Whether the Collapse all button is shown in the toolbar."
-              }
-            }
-          },
-          "show-filter": {
-            "list-name": "Show filter box",
-            "display-text": "Set the filter box [b]{0}[/b]",
-            "description": "Whether the key filter input is shown in the toolbar.",
-            "params": {
-              "enabled": {
-                "name": "Visible",
-                "desc": "Whether the key filter input is shown in the toolbar."
-              }
-            }
-          },
           "set-add-buttons": {
             "list-name": "Set add buttons",
             "display-text": "Set add buttons to [b]{0}[/b]",
@@ -493,6 +351,82 @@
               }
             }
           },
+          "set-close-behaviour": {
+            "list-name": "Set close behaviour",
+            "display-text": "Set close behaviour to [b]{0}[/b]",
+            "description": "What the close button does after flushing pending edits. On close clicked fires either way.",
+            "params": {
+              "mode": {
+                "name": "Behaviour",
+                "desc": "What happens when the close button is clicked.",
+                "items": {
+                  "trigger": "Trigger only",
+                  "hide": "Hide",
+                  "destroy": "Destroy"
+                }
+              }
+            }
+          },
+          "set-tab-bar": {
+            "list-name": "Set tab bar",
+            "display-text": "Set tab bar to [b]{0}[/b]",
+            "description": "When the tab bar should be shown.",
+            "params": {
+              "mode": {
+                "name": "Mode",
+                "desc": "When to show the tab bar.",
+                "items": {
+                  "auto": "Auto (hide when single)",
+                  "always": "Always",
+                  "never": "Never"
+                }
+              }
+            }
+          },
+          "set-ui-scale": {
+            "list-name": "Set UI scale",
+            "display-text": "Set UI scale to [b]{0}[/b]",
+            "description": "Multiply the base font size the whole editor is laid out in. Everything is sized in em, so this scales the tree as a whole.",
+            "params": {
+              "scale": {
+                "name": "Scale",
+                "desc": "The scale factor. 1 is the page's own font size."
+              }
+            }
+          },
+          "show-close-button": {
+            "list-name": "Show close button",
+            "display-text": "Set the close button [b]{0}[/b]",
+            "description": "Whether a close button is shown in the tab bar.",
+            "params": {
+              "enabled": {
+                "name": "Visible",
+                "desc": "Whether a close button is shown in the tab bar."
+              }
+            }
+          },
+          "show-collapse-all": {
+            "list-name": "Show collapse all",
+            "display-text": "Set the Collapse all button [b]{0}[/b]",
+            "description": "Whether the Collapse all button is shown in the toolbar.",
+            "params": {
+              "enabled": {
+                "name": "Visible",
+                "desc": "Whether the Collapse all button is shown in the toolbar."
+              }
+            }
+          },
+          "show-filter": {
+            "list-name": "Show filter box",
+            "display-text": "Set the filter box [b]{0}[/b]",
+            "description": "Whether the key filter input is shown in the toolbar.",
+            "params": {
+              "enabled": {
+                "name": "Visible",
+                "desc": "Whether the key filter input is shown in the toolbar."
+              }
+            }
+          },
           "collapse-all": {
             "list-name": "Collapse all",
             "display-text": "Collapse all",
@@ -577,29 +511,6 @@
               }
             }
           },
-          "set-source-kind": {
-            "list-name": "Set source kind",
-            "display-text": "Set source kind of tab [i]{1}[/i] to [b]{0}[/b]",
-            "description": "Choose how the bound object is read, or bind the tab to the project's global variables.",
-            "params": {
-              "kind": {
-                "name": "Kind",
-                "desc": "How to read the source.",
-                "items": {
-                  "auto": "Auto-detect",
-                  "json": "JSON",
-                  "dictionary": "Dictionary",
-                  "array": "Array",
-                  "globals": "Global variables",
-                  "none": "None"
-                }
-              },
-              "tab": {
-                "name": "Tab",
-                "desc": "Which tab to change. Leave empty for the current tab."
-              }
-            }
-          },
           "set-source-object": {
             "list-name": "Set source object",
             "display-text": "Set source of tab [i]{1}[/i] to [b]{0}[/b]",
@@ -609,6 +520,17 @@
                 "name": "Object",
                 "desc": "The object to edit."
               },
+              "tab": {
+                "name": "Tab",
+                "desc": "Which tab to change. Leave empty for the current tab."
+              }
+            }
+          },
+          "set-source-to-globals": {
+            "list-name": "Set source to global variables",
+            "display-text": "Set source of tab [i]{0}[/i] to global variables",
+            "description": "Point a tab at the project's global variables instead of an object.",
+            "params": {
               "tab": {
                 "name": "Tab",
                 "desc": "Which tab to change. Leave empty for the current tab."
@@ -630,10 +552,25 @@
               }
             }
           },
+          "add-globals-tab": {
+            "list-name": "Add global variables tab",
+            "display-text": "Add tab [b]{0}[/b] labelled [i]{1}[/i] for global variables",
+            "description": "Add a tab showing the project's global variables. Keys cannot be added or removed, and each write is coerced back to the type the variable already holds.",
+            "params": {
+              "tab": {
+                "name": "Tab ID",
+                "desc": "A name for this tab, used by the other tab actions."
+              },
+              "label": {
+                "name": "Label",
+                "desc": "The text shown on the tab button."
+              }
+            }
+          },
           "add-tab": {
             "list-name": "Add tab",
-            "display-text": "Add tab [b]{0}[/b] labelled [i]{1}[/i] for [b]{3}[/b] ({2})",
-            "description": "Add a tab, or reconfigure one that already exists. The tab bar appears once there is more than one tab.",
+            "display-text": "Add tab [b]{0}[/b] labelled [i]{1}[/i] for [b]{2}[/b]",
+            "description": "Add a tab bound to an object, or reconfigure one that already exists. How to read the object is worked out from its type. The tab bar appears once there is more than one tab.",
             "params": {
               "tab": {
                 "name": "Tab ID",
@@ -643,21 +580,9 @@
                 "name": "Label",
                 "desc": "The text shown on the tab button."
               },
-              "kind": {
-                "name": "Kind",
-                "desc": "How to read the source.",
-                "items": {
-                  "auto": "Auto-detect",
-                  "json": "JSON",
-                  "dictionary": "Dictionary",
-                  "array": "Array",
-                  "globals": "Global variables",
-                  "none": "None"
-                }
-              },
               "object": {
                 "name": "Object",
-                "desc": "The object this tab edits. Ignored for global variables."
+                "desc": "The JSON, Dictionary or Array object this tab edits."
               }
             }
           },
@@ -686,6 +611,60 @@
               "tab": {
                 "name": "Tab ID",
                 "desc": "The tab to show."
+              }
+            }
+          },
+          "load-css-from-file": {
+            "list-name": "Load CSS file",
+            "display-text": "Load CSS file [b]{0}[/b] ({1})",
+            "description": "Load a .css file from the project's Files folder. Adding it on top means the file only has to override the --je-* variables it cares about; replacing means it becomes the theme. The layout layer is applied first either way and is never affected.",
+            "params": {
+              "filename": {
+                "name": "File",
+                "desc": "The name of a .css file in the project's Files folder."
+              },
+              "mode": {
+                "name": "Mode",
+                "desc": "Whether the file adds to what is already there or replaces it.",
+                "items": {
+                  "append": "Add on top of what is there",
+                  "replace": "Replace everything but the layout"
+                }
+              }
+            }
+          },
+          "load-css-string": {
+            "list-name": "Load CSS string",
+            "display-text": "Load CSS [i]{0}[/i] ({1})",
+            "description": "Apply CSS supplied directly, for a theme built or fetched by events. Adding it on top means it only has to override the --je-* variables it cares about; replacing means it becomes the theme. The layout layer is applied first either way and is never affected.",
+            "params": {
+              "css": {
+                "name": "CSS",
+                "desc": "The stylesheet to apply."
+              },
+              "mode": {
+                "name": "Mode",
+                "desc": "Whether the CSS adds to what is already there or replaces it.",
+                "items": {
+                  "append": "Add on top of what is there",
+                  "replace": "Replace everything but the layout"
+                }
+              }
+            }
+          },
+          "set-theme": {
+            "list-name": "Set theme",
+            "display-text": "Set theme to [b]{0}[/b]",
+            "description": "Switch to one of the built-in themes. Any CSS loaded on top of the previous theme is cleared.",
+            "params": {
+              "theme": {
+                "name": "Theme",
+                "desc": "The built-in theme to apply.",
+                "items": {
+                  "construct-dark": "Construct dark",
+                  "construct-light": "Construct light",
+                  "bare": "Bare (layout only)"
+                }
               }
             }
           }
@@ -765,11 +744,6 @@
           }
         },
         "expressions": {
-          "theme": {
-            "translated-name": "Theme",
-            "description": "The name of the current built-in theme, or \"custom\" when CSS was supplied directly.",
-            "params": {}
-          },
           "last-key": {
             "translated-name": "LastKey",
             "description": "The key or index the last edit touched.",
@@ -803,6 +777,11 @@
           "last-tab-id": {
             "translated-name": "LastTabId",
             "description": "The ID of the tab the last edit or tab change happened on.",
+            "params": {}
+          },
+          "theme": {
+            "translated-name": "Theme",
+            "description": "The name of the current built-in theme, or \"custom\" when a stylesheet replaced it.",
             "params": {}
           }
         }

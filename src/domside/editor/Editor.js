@@ -161,19 +161,14 @@ export class Editor {
     );
   }
 
-  /** Swap the theme layer for one of the built-ins. */
+  /** Swap to a built-in theme, dropping any CSS added on top of it. */
   setTheme(name) {
     this._styles.setTheme(name);
   }
 
-  /** Replace the theme layer with CSS supplied by the project. */
-  setThemeCss(css) {
-    this._styles.setThemeCss(css);
-  }
-
-  /** Stack extra rules on top of whichever theme is active. */
-  setAppendedCss(css) {
-    this._styles.setAppendedCss(css);
+  /** Apply project CSS, either on top of the theme or in place of it. */
+  applyCss(css, mode) {
+    this._styles.applyCss(css, mode);
   }
 
   get perms() {
@@ -551,9 +546,8 @@ export class Editor {
       (this.chrome.tabBar === "auto" && this.tabs.size > 1);
 
     if (showTabs || this.chrome.close) {
-      const { bar, buttons } = buildTabBar(this);
+      const { bar, buttons } = buildTabBar(this, showTabs);
       this._tabButtons = buttons;
-      bar.hidden = !showTabs && !this.chrome.close;
       parts.push(bar);
     } else {
       this._tabButtons = new Map();

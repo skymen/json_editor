@@ -1,6 +1,6 @@
 {
   "1.0.0.0": {
-    "added": "First release. A DOM plugin that edits a JSON, Dictionary or Array object, or the project's global variables, as a tree in the running game.\nTabs, built from events, each with its own expansion, filter and z plane state.\nc2array and c2dictionary support, in object form and in string form, each independently toggleable.\nPer capability editing permissions: values, object keys, key renaming, array elements, reordering, c2array resizing.\nThree built-in themes and a two layer stylesheet, so a custom theme only has to describe colour.\nEdit, focus and close triggers with dot separated paths matching the JSON plugin.",
+    "added": "First release. A DOM plugin that edits a JSON, Dictionary or Array object, or the project's global variables, as a tree in the running game.\nTabs, built from events, each with its own expansion, filter and z plane state.\nc2array and c2dictionary support, in object form and in string form, each independently toggleable.\nPer capability editing permissions: values, object keys, key renaming, array elements, reordering, c2array resizing.\nThree built-in themes and a two layer stylesheet, so a custom theme only has to describe colour. Set theme, Load CSS file and Load CSS string are the whole styling surface.\nEdit, focus and close triggers with dot separated paths matching the JSON plugin.",
     "changed": "",
     "fixed": ""
   }

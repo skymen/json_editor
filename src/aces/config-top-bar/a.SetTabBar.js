@@ -1,3 +1,5 @@
+import { TAB_BAR_ITEMS } from "../../shared/combos.js";
+
 export const config = {
   id: "set-tab-bar",
   listName: "Set tab bar",
@@ -11,11 +13,7 @@ export const config = {
       desc: "When to show the tab bar.",
       type: "combo",
       initialValue: "auto",
-      items: [
-        { auto: "Auto (hide when single)" },
-        { always: "Always" },
-        { never: "Never" },
-      ],
+      items: TAB_BAR_ITEMS,
     },
   ],
 };
@@ -23,5 +21,5 @@ export const config = {
 export const expose = false;
 
 export default function (mode) {
-  this.setChrome("tabBar", mode);
+  this.setTabBar(mode);
 }

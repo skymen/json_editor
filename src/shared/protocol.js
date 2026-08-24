@@ -78,10 +78,11 @@ export const COMMAND = {
   RESTORE_VIEW: "restoreView", // { tabs: {...}, active }
 };
 
-/** Which style layer a STYLE message targets. */
-export const STYLE_LAYER = {
-  THEME: "theme",
-  APPEND: "append",
+/** What a STYLE message asks for. */
+export const STYLE_MODE = {
+  THEME: "theme", // { theme } - a built-in, clearing anything added on top
+  APPEND: "append", // { css }  - stacked on the current theme
+  REPLACE: "replace", // { css }  - becomes the theme
 };
 
 /** Everything the DOM side needs to know to render. Built by the runtime. */

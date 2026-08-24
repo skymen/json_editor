@@ -1,3 +1,5 @@
+import { ADD_BUTTON_ITEMS } from "../../shared/combos.js";
+
 export const config = {
   id: "set-add-buttons",
   listName: "Set add buttons",
@@ -11,11 +13,7 @@ export const config = {
       desc: "Which add buttons to show.",
       type: "combo",
       initialValue: "value-array",
-      items: [
-        { value: "Value only" },
-        { "value-array": "Value and array" },
-        { "value-object-array": "Value, object and array" },
-      ],
+      items: ADD_BUTTON_ITEMS,
     },
   ],
 };

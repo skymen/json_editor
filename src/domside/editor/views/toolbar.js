@@ -3,19 +3,26 @@
 
 import { make, makeButton } from "../dom.js";
 
-export function buildTabBar(ctx) {
+/**
+ * The tab bar row. `showTabs` decides whether the tab buttons themselves are
+ * built: the row can still be needed for the close button alone, and in that
+ * case it must not smuggle a single pointless tab button back in.
+ */
+export function buildTabBar(ctx, showTabs) {
   const bar = make("div", "je-bar je-tabbar");
   const tabs = make("div", "je-tabs");
 
   const buttons = new Map();
-  for (const id of ctx.tabs.ids) {
-    const label = ctx.tabs.labelOf(id);
-    const btn = makeButton("je-tab", label, `Edit ${label}`, () =>
-      ctx.selectTab(id),
-    );
-    btn.classList.toggle("je-on", id === ctx.tabs.activeId);
-    buttons.set(id, btn);
-    tabs.append(btn);
+  if (showTabs) {
+    for (const id of ctx.tabs.ids) {
+      const label = ctx.tabs.labelOf(id);
+      const btn = makeButton("je-tab", label, `Edit ${label}`, () =>
+        ctx.selectTab(id),
+      );
+      btn.classList.toggle("je-on", id === ctx.tabs.activeId);
+      buttons.set(id, btn);
+      tabs.append(btn);
+    }
   }
 
   bar.append(tabs);
