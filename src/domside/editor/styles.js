@@ -15,16 +15,16 @@
 // nothing here.
 
 import layoutCss from "../../css/layout.css?raw";
-import themeBaseCss from "../../css/theme.base.css?raw";
+import constructBaseCss from "../../css/theme.construct-base.css?raw";
 import constructDarkCss from "../../css/theme.construct-dark.css?raw";
 import constructLightCss from "../../css/theme.construct-light.css?raw";
 import bareCss from "../../css/theme.bare.css?raw";
 
-// A built-in theme is the descriptive base plus its variable block. "bare"
-// deliberately skips the base too, leaving layout on its own.
+// A Construct theme is the shared control language plus a palette. "bare"
+// deliberately takes neither, leaving layout on its own.
 const BUILT_IN_THEMES = {
-  "construct-dark": themeBaseCss + constructDarkCss,
-  "construct-light": themeBaseCss + constructLightCss,
+  "construct-dark": constructBaseCss + constructDarkCss,
+  "construct-light": constructBaseCss + constructLightCss,
   bare: bareCss,
 };
 

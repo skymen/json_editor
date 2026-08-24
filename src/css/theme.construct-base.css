@@ -1,0 +1,224 @@
+/*
+ * The Construct control language, parameterised by a palette.
+ *
+ * This is the shared half of the two Construct themes: it reproduces *how* C3
+ * draws its controls, while theme.construct-dark.css and -light.css supply the
+ * greys. C3's own two themes relate to each other exactly this way - identical
+ * rules, one grey ramp, read from opposite ends - so the split is not an
+ * invention, it is how the real thing is built.
+ *
+ * The idioms, taken from Construct's theme CSS rather than guessed at:
+ *
+ *   1. No borders. Controls are separated by fill alone; the only lines in the
+ *      whole UI are 1px dividers.
+ *   2. Small radii, and only where C3 uses them: 2px on tree rows, 3px on
+ *      fields, 4px on buttons. Tabs are rounded on the bottom edge only.
+ *   3. Pressing inverts. A held button swaps to a near-white fill with dark
+ *      text (and the reverse in the light theme). C3 does this on toolbar
+ *      buttons, property buttons and tree selection alike.
+ *   4. Focus darkens the field rather than drawing a ring, and brightens its
+ *      text to full white.
+ *   5. Inactive tabs fade with opacity rather than changing colour: 0.35
+ *      resting, 0.9 hovered, 1 active with a heavier weight.
+ *
+ * Layout lives in layout.css and is always applied first. Nothing here sets
+ * display, flex, grid, width or height.
+ */
+
+.je {
+  color: var(--je-fg);
+  background: var(--je-bg);
+  border-radius: var(--je-radius-panel);
+}
+
+.je-body {
+  padding: 0.3em 0.45em 0.5em 0.45em;
+}
+
+/* ------------------------------------------------------------------- bars */
+
+.je-bar {
+  padding: 0.25em 0.3em;
+  background: var(--je-bar-bg);
+}
+.je-header > .je-bar:first-child {
+  border-radius: var(--je-radius-panel) var(--je-radius-panel) 0 0;
+}
+.je-header > .je-bar:last-child {
+  border-bottom: 1px solid var(--je-line);
+}
+
+/* Tabs hang off the bar and are rounded along the bottom, the way C3 rounds a
+   top-docked tab bar. Inactive ones are the same fill at low opacity. */
+.je-tab {
+  padding: 0.1em 0.7em;
+  border: none;
+  border-radius: 0 0 var(--je-radius-tab) var(--je-radius-tab);
+  color: var(--je-tab-fg);
+  background: var(--je-tab-bg);
+  opacity: 0.35;
+}
+.je-tab:hover {
+  opacity: 0.9;
+}
+.je-tab.je-on {
+  font-weight: 500;
+  opacity: 1;
+}
+
+.je-close {
+  padding: 0 0.45em;
+  border-radius: var(--je-radius-control);
+  color: var(--je-muted);
+  background: none;
+  border: none;
+  font-weight: bold;
+}
+.je-close:hover {
+  color: var(--je-press-fg);
+  background: var(--je-del-border);
+}
+
+/* ----------------------------------------------------------------- fields */
+
+.je-search,
+.je-val,
+.je-dim,
+.je-keyedit {
+  padding: 0.1em 0.5em;
+  color: var(--je-fg);
+  border: none;
+  border-radius: var(--je-radius-control);
+  background: var(--je-field-bg);
+}
+.je-search:hover,
+.je-val:hover:enabled,
+.je-dim:hover:enabled,
+.je-keyedit:hover:enabled {
+  background: var(--je-field-bg-hover);
+}
+.je-search:focus,
+.je-val:focus,
+.je-dim:focus,
+.je-keyedit:focus {
+  color: var(--je-field-fg-focus);
+  outline: none;
+  background: var(--je-field-bg-focus);
+}
+.je-search::placeholder {
+  opacity: 1;
+  color: var(--je-placeholder);
+}
+.je-val:disabled,
+.je-keyedit:disabled {
+  color: var(--je-fg);
+  opacity: 0.5;
+}
+
+.je-t-number {
+  color: var(--je-t-number);
+}
+.je-t-string {
+  color: var(--je-t-string);
+}
+.je-t-keyword {
+  color: var(--je-t-keyword);
+}
+.je-val.je-invalid {
+  color: var(--je-invalid-fg);
+  background: var(--je-invalid-bg);
+}
+
+/* ------------------------------------------------------------------- tree */
+
+.je-children {
+  border-left: 1px solid var(--je-line);
+}
+
+.je-head,
+.je-row {
+  padding: 0.05em 0.3em;
+  border-radius: var(--je-radius-row);
+}
+.je-head:hover {
+  background: var(--je-hover-bg);
+}
+
+.je-caret {
+  color: var(--je-muted);
+}
+.je-badge {
+  font-size: 0.85em;
+  color: var(--je-dim);
+}
+.je-key {
+  color: var(--je-key);
+}
+.je-key.je-hit {
+  color: var(--je-key-hit);
+  font-weight: 500;
+}
+.je-idx {
+  color: var(--je-muted);
+  font-family: var(--je-font-mono);
+}
+.je-message {
+  padding: 0.35em 0.3em;
+  color: var(--je-dim);
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.je-btn {
+  padding: 0 0.4em;
+  color: var(--je-btn-fg);
+  border: none;
+  border-radius: var(--je-radius-control);
+  background: var(--je-btn-bg);
+  line-height: 1.45;
+}
+.je-btn:hover:enabled {
+  color: var(--je-btn-fg-hover);
+  background: var(--je-btn-bg-hover);
+}
+/* The inversion: a held control flips to the far end of the ramp. */
+.je-btn:active:enabled {
+  color: var(--je-press-fg);
+  background: var(--je-press-bg);
+}
+.je-btn:disabled {
+  opacity: 0.35;
+}
+.je-add:hover:enabled {
+  color: var(--je-press-fg);
+  background: var(--je-add-border);
+}
+.je-del:hover:enabled {
+  color: var(--je-press-fg);
+  background: var(--je-del-border);
+}
+.je-addbar {
+  padding: 0.15em 0.3em 0.05em 0.3em;
+}
+
+/* --------------------------------------------------------------- c2array */
+
+.je-dims,
+.je-zbar {
+  color: var(--je-dim);
+}
+.je-zbar {
+  padding: 0.15em 0.3em;
+  font-size: 0.9em;
+}
+.je-dim {
+  font-size: 0.9em;
+  padding: 0 0.25em;
+}
+.je-grid {
+  padding: 0.05em 0.3em;
+}
+.je-col-label {
+  font-size: 0.85em;
+  color: var(--je-muted);
+}

@@ -42,6 +42,7 @@ npm run dev
 ## Examples Files
 | Description | Download |
 | --- | --- |
+| json-editor-showcase | [<img src="https://placehold.co/120x30/4493f8/FFF?text=Download&font=montserrat" width="120"/>](https://github.com/skymen/json_editor/raw/refs/heads/main/examples/json-editor-showcase.c3p) |
 
 ---
 ## Properties
