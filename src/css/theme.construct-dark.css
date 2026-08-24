@@ -27,7 +27,7 @@
 
   /* Surfaces */
   --je-bg: #575757; /* gray11, C3's dialog body */
-  --je-bar-bg: #696969; /* gray13, C3's active dialog caption */
+  --je-bar-bg: #5e5e5e; /* gray12, C3's inactive dialog caption */
   --je-line: #707070; /* gray14 */
   --je-hover-bg: #696969; /* gray13 */
 
@@ -39,9 +39,12 @@
 
   /* Buttons, and the inversion C3 uses for a held control */
   --je-btn-fg: #cfcfcf; /* gray26 */
-  --je-btn-bg: #696969; /* gray13 */
+  /* C3 puts a dialog button on gray13, but its dialogs have no buttons sitting
+     on the caption. One step lighter keeps them legible on the bar as well as
+     on the body. */
+  --je-btn-bg: #707070; /* gray14 */
   --je-btn-fg-hover: #f0f0f0; /* gray30 */
-  --je-btn-bg-hover: #808080; /* gray16 */
+  --je-btn-bg-hover: #878787; /* gray17 */
   --je-press-fg: #1f1f1f; /* gray4, dark text ... */
   --je-press-bg: #f7f7f7; /* gray31, ... on a near-white fill */
 

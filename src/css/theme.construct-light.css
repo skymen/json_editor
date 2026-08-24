@@ -28,7 +28,10 @@
 
   /* Surfaces */
   --je-bg: #e8e8e8; /* gray29, C3's light dialog body */
-  --je-bar-bg: #f7f7f7; /* gray31, C3's light dialog caption */
+  /* C3's light caption is gray31, but that is the same fill its input fields
+     use, so the search box would vanish into the bar. A step down separates
+     them while keeping the bar distinct from the body. */
+  --je-bar-bg: #dedede; /* gray28 */
   --je-line: #cfcfcf; /* gray26 */
   --je-hover-bg: #dedede; /* gray28, C3's light tree row hover */
 

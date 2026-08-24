@@ -4,10 +4,12 @@
 // when it is matched or has a matched key somewhere beneath it, which is what
 // lets a deep hit stay reachable through its ancestors.
 //
-// The walk deliberately stops at C2 wrappers: their contents are data, not
-// structure, and a c2array grid has no per-key rows to filter.
+// The walk descends through arrays as well as objects, using the index as the
+// key, because a match is very often inside one - filtering a save for "qty"
+// has to reach inventory.1.qty. It stops at C2 wrappers: their contents are
+// data, not structure, and a c2array grid has no per-key rows to filter.
 
-import { isPlainObject } from "../../shared/jsonUtils.js";
+import { isContainer } from "../../shared/jsonUtils.js";
 import { detectC2Wrapper } from "../../shared/c2formats.js";
 import { SEP, ROOT_PATH } from "../../shared/paths.js";
 
@@ -20,11 +22,15 @@ export function computeFilter(data, query, detect) {
   const matched = new Set();
 
   const walk = (container, path) => {
-    if (!isPlainObject(container)) return false;
+    if (!isContainer(container)) return false;
     if (detectC2Wrapper(container, detect)) return false;
 
+    const keys = Array.isArray(container)
+      ? container.map((_, i) => String(i))
+      : Object.keys(container);
+
     let any = false;
-    for (const key of Object.keys(container)) {
+    for (const key of keys) {
       const childPath = path + SEP + key;
       const self = keyMatches(key, query);
       const below = walk(container[key], childPath);

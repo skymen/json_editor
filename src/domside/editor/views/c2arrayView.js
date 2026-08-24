@@ -21,10 +21,9 @@ const DIM_TITLES = ["Width (X)", "Height (Y)", "Depth (Z)"];
 export function fillC2ArrayHead(ctx, head, node, arr, path, setOpen) {
   const keys = pathKeys(path);
 
-  // Badge on the left, then everything that acts on the array collected on the
-  // right: the size inputs sit next to the add button rather than between the
-  // name and it.
-  head.append(make("span", "je-badge", "c2array"), make("span", "je-spacer"));
+  // Everything that describes or acts on the array is collected on the right:
+  // the badge, then the size inputs, then the add button.
+  head.append(make("span", "je-spacer"), make("span", "je-badge", "c2array"));
 
   const rebuildOnly = () => ctx.rebuildNodeChildren(node, arr, path);
   node._jeOnStructureChange = rebuildOnly;

@@ -22,7 +22,7 @@ function uniqueKey(data) {
 }
 
 export function c2DictBadge(dict) {
-  return `dict {${Object.keys(dict["data"]).length}}`;
+  return `c2dictionary {${Object.keys(dict["data"]).length}}`;
 }
 
 export function fillC2DictHead(ctx, head, node, dict, path) {
@@ -33,7 +33,7 @@ export function fillC2DictHead(ctx, head, node, dict, path) {
     ctx.rebuildNodeChildren(node, dict, path);
   };
 
-  head.append(badge);
+  head.append(make("span", "je-spacer"), badge);
 }
 
 export function fillC2DictChildren(ctx, children, dict, path) {

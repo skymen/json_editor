@@ -23,6 +23,7 @@ import { SEP, ROOT_PATH, pathFromKeys, toPublicPath } from "../../shared/paths.j
 
 const CONTROL_SELECTOR = "input, textarea, button, select";
 const VIEW_STATE_DEBOUNCE_MS = 500;
+const FLASH_MS = 1200;
 const BLOCKED_KEY_EVENTS = ["keydown", "keyup", "keypress"];
 // The same list Construct's own form controls block, so input never reaches
 // the Mouse, Touch or Keyboard objects.
@@ -68,6 +69,9 @@ export class Editor {
     this._viewStateTimer = 0;
     this._lastViewState = "";
 
+    this._flashTimer = 0;
+    this._flashed = null;
+
     // Window level, so a release outside the element still counts. It also
     // self-detaches once the host is gone, which covers a teardown that never
     // reached destroy().
@@ -91,6 +95,7 @@ export class Editor {
     this.flushPending();
     clearTimeout(this._pendingTimer);
     clearTimeout(this._viewStateTimer);
+    clearTimeout(this._flashTimer);
     for (const type of ["pointerup", "pointercancel"])
       window.removeEventListener(type, this._onWindowPointerUp, true);
   }
@@ -332,6 +337,7 @@ export class Editor {
    */
   _reportViewState() {
     clearTimeout(this._viewStateTimer);
+    clearTimeout(this._flashTimer);
     this._viewStateTimer = setTimeout(() => {
       this._viewStateTimer = 0;
       this._saveViewState();
@@ -498,7 +504,35 @@ export class Editor {
       [...this.body.querySelectorAll(".je-node")].find(
         (n) => n._jePath === path,
       );
-    target?.scrollIntoView({ block: "center" });
+    if (!target) return;
+
+    // Optional: not every environment implements scrollIntoView, and the
+    // flash is worth doing even where the scroll cannot happen.
+    target.scrollIntoView?.({ block: "center" });
+    this._flash(target);
+  }
+
+  /**
+   * Light an element up briefly. Arriving somewhere in a large tree says
+   * nothing about where you landed, so the destination announces itself.
+   */
+  _flash(el) {
+    clearTimeout(this._flashTimer);
+    this._flashed?.classList.remove("je-flash");
+
+    // Reading offsetWidth restarts the animation if the same element is
+    // targeted twice in a row; without it the class is already there and
+    // nothing happens.
+    el.classList.remove("je-flash");
+    void el.offsetWidth;
+    el.classList.add("je-flash");
+
+    this._flashed = el;
+    this._flashTimer = setTimeout(() => {
+      el.classList.remove("je-flash");
+      this._flashed = null;
+      this._flashTimer = 0;
+    }, FLASH_MS);
   }
 
   onFilterInput() {
