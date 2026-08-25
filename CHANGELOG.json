@@ -13,5 +13,10 @@
     "added": "",
     "changed": "UI now scales with C3 canvas scale",
     "fixed": ""
+  },
+  "1.1.1.1": {
+    "added": "github link",
+    "changed": "",
+    "fixed": ""
   }
 }

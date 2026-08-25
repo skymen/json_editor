@@ -6,7 +6,7 @@
       "skymen_jsoneditor": {
         "name": "JSON Editor",
         "description": "An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.",
-        "help-url": "https://www.construct.net",
+        "help-url": "https://github.com/skymen/json_editor",
         "aceCategories": {
           "config-editing": "Config: editing",
           "config-top-bar": "Config: top bar",

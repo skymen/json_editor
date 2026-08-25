@@ -20,8 +20,8 @@ export const name = "JSON Editor";
 export const version = _version;
 export const minConstructVersion = undefined;
 export const author = "skymen";
-export const website = "https://www.construct.net";
-export const documentation = "https://www.construct.net";
+export const website = "https://github.com/skymen/json_editor";
+export const documentation = "https://github.com/skymen/json_editor";
 export const description =
   "An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.";
 export const category = ADDON_CATEGORY.FORM_CONTROLS;

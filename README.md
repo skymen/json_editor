@@ -1,19 +1,21 @@
 <img src="./examples/cover.png" width="150" /><br>
 # JSON Editor
 <i>An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.</i> <br>
-### Version 1.1.1.0
+### Version 1.1.1.1
 
-[<img src="https://placehold.co/200x50/4493f8/FFF?text=Download&font=montserrat" width="200"/>](https://github.com/skymen/json_editor/releases/download/skymen_JSONEditor-1.1.1.0.c3addon/skymen_JSONEditor-1.1.1.0.c3addon)
+[<img src="https://placehold.co/200x50/4493f8/FFF?text=Download&font=montserrat" width="200"/>](https://github.com/skymen/json_editor/releases/download/skymen_JSONEditor-1.1.1.1.c3addon/skymen_JSONEditor-1.1.1.1.c3addon)
 <br>
 <sub> [See all releases](https://github.com/skymen/json_editor/releases) </sub> <br>
 
-#### What's New in 1.1.1.0
-- **Changed:** UI now scales with C3 canvas scale
+#### What's New in 1.1.1.1
+- **Added:** github link
 
 <sub>[View full changelog](#changelog)</sub>
 
 ---
 <b><u>Author:</u></b> skymen <br>
+<b>[Construct Addon Page](https://www.construct.net/en/make-games/addons/1688/json-editor)</b>  <br>
+<b>[Documentation](https://github.com/skymen/json_editor)</b>  <br>
 <sub>Made using [CAW](https://marketplace.visualstudio.com/items?itemName=skymen.caw) </sub><br>
 
 ## Table of Contents
@@ -169,6 +171,9 @@ npm run dev
 
 ---
 ## Changelog
+
+**1.1.1.1**
+- **Added:** github link
 
 **1.1.1.0**
 - **Changed:** UI now scales with C3 canvas scale
