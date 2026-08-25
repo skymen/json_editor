@@ -1,4 +1,4 @@
-<img src="./src/icon.svg" width="100" /><br>
+<img src="./examples/cover.png" width="150" /><br>
 # JSON Editor
 <i>An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.</i> <br>
 ### Version 1.0.0.0
