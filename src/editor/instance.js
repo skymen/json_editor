@@ -7,42 +7,69 @@ const PANEL = [0x57 / 255, 0x57 / 255, 0x57 / 255]; // gray11, dialog body
 const BAR = [0x5e / 255, 0x5e / 255, 0x5e / 255]; // gray12, dialog caption
 const MARK = [0x29 / 255, 0xf3 / 255, 0xd0 / 255]; // the accent teal
 const EDGE = [0x17 / 255, 0x17 / 255, 0x17 / 255]; // gray3, C3's dialog border
-const EDGE_WIDTH = 1;
+const EDGE_WIDTH = 2; // screen pixels, held constant across zoom levels
 
 const BAR_HEIGHT = 0.13; // of the object height
 const BAR_MAX = 22; // but never taller than this
 
-const MARK_HEIGHT = 0.34; // of the shorter side
-const BRACE_WIDTH = 0.32; // of the mark's height
-const BRACE_GAP = 0.2; // ditto
-const THICKNESS = 0.15; // ditto, at the stroke's widest
+const MARK_HEIGHT = 0.4; // of the shorter side
+const MARK_MAX_WIDTH = 0.7; // of the object width
+const BRACE_GAP = 0.34; // between the two arm ends, in brace heights
+const STEPS = 40; // samples across half a brace
 
-// The curls take about a quarter of each half, so a low sample count leaves
-// only a handful of segments in them and they render as straight diagonal
-// slashes. This draws once per layout repaint, so it can afford to be smooth.
-const STEPS = 48;
+/*
+ * The brace is Construct's own, read off the JSON plugin's icon (a 435x338
+ * artwork) and normalised to a brace height of 1. It is not a tapered curve:
+ * the stroke is a constant 40 units thick everywhere, and the shape is built
+ * from straight runs joined by circular fillets.
+ *
+ *   - a vertical spine between x 50 and 90
+ *   - arms at each end reaching out to x 131.5, turning through an outer
+ *     radius of 52 and an inner radius of 12 (52 - 12 = the thickness)
+ *   - a middle arm reaching the other way to x 0, turning through a fillet of
+ *     radius 34 on the outside
+ *   - an inner edge that leaves the spine at y 115 on a single circular arc,
+ *     tangent there, meeting its mirror at the middle point
+ *
+ * That last arc is drawn as two cubics in the artwork; solving for the circle
+ * tangent to the spine and through the tip gives r = 74.249, and the cubic's
+ * own midpoint sits 74.245 from that centre, so a true arc reproduces it.
+ */
+const S = 338;
+const B_WIDTH = 131.5 / S;
+const ARM_INNER_Y = 40 / S;
+const END_CX = 102 / S;
+const END_CY = 52 / S;
+const END_OUTER_R = 52 / S;
+const END_INNER_R = 12 / S;
+const SPINE_OUTER = 50 / S;
+const SPINE_INNER = 90 / S;
+const WAIST_Y = 115 / S; // both edges leave the spine here
+const FILLET_CX = 16 / S;
+const FILLET_R = 34 / S;
+const MID_ARM_Y = 149 / S; // the middle arm's flat edge starts here
+const INNER_TIP = 66.7109 / S;
 
-// A brace's anatomy, as fractions of the distance from its middle point to a
-// terminal: the tip curve, then a straight spine, then the terminal curling
-// back towards whatever the braces enclose.
-const TIP_END = 0.32;
-const CURL_START = 0.78;
-const SPINE = 0.55; // the spine's x, as a fraction of the full width
+// The inner arc, from its tangency at the waist and the middle point it reaches.
+const INNER_DX = SPINE_INNER - INNER_TIP;
+const INNER_DY = 0.5 - WAIST_Y;
+const INNER_R = (INNER_DX * INNER_DX + INNER_DY * INNER_DY) / (2 * INNER_DX);
+const INNER_CX = SPINE_INNER - INNER_R;
 
-// A brace is not a pipe of even thickness: it swells along the spine and
-// tapers to the middle point and to each terminal. Without this the terminals
-// read as blunt diagonal slabs.
-const TAPER = 0.26; // fraction of each half spent tapering
-const THIN = 0.5; // stroke width at the very ends, of the widest
+const EPS = 1e-6;
+// The breakpoints land exactly on the ends of the arcs, and mirroring a height
+// can leave it a few ULPs the wrong side of one. chord() clamps, so widening
+// the ranges by a hair just pins those samples to the arc's endpoint.
+const TOL = 1e-9;
 
 /**
  * The layout view cannot render the real editor - it is a DOM element - so the
  * object draws a bar and a { } mark instead.
  *
  * The editor renderer has no mesh call, but it does have Quad2, which takes
- * four arbitrary corners. Each brace is therefore a curve sampled into points
- * and extruded into a ribbon of quads, mitred at the joins so the strip reads
- * as one continuous stroke.
+ * four arbitrary corners. A brace covers exactly one horizontal span at every
+ * height, so it is drawn as a strip of trapezoids: one quad between each pair
+ * of sampled rows, spanning that row's outer and inner edges.
  */
 export default function (instanceClass) {
   return class extends instanceClass {
@@ -77,7 +104,6 @@ export default function (instanceClass) {
       // under them, and so it is drawn even when the instance is too small for
       // anything else. C3 gives a dialog a 4px rgba(23,23,23,.7) border; this
       // is the same colour, thinner so it does not swallow a small object.
-      //
       iRenderer.SetColorRgba(EDGE[0], EDGE[1], EDGE[2], 1);
       iRenderer.PushLineWidth(lineWidth(EDGE_WIDTH, iDrawParams));
       iRenderer.PushLineCap("square");
@@ -96,20 +122,13 @@ export default function (instanceClass) {
       rect(iRenderer, x, y, g.w, g.barH);
 
       if (!g.mark) return;
-      const { cx, cy, height, braceW, gap, thickness } = g.mark;
+      const { cx, cy, height, gap } = g.mark;
 
       iRenderer.SetColorRgba(MARK[0], MARK[1], MARK[2], 1);
       const emit = (...corners) => iRenderer.Quad2(...corners);
-      ribbon(
-        emit,
-        brace(cx - gap / 2 - braceW, cy, height, braceW, 1),
-        thickness,
-      );
-      ribbon(
-        emit,
-        brace(cx + gap / 2 + braceW, cy, height, braceW, -1),
-        thickness,
-      );
+      const tip = gap / 2 + B_WIDTH * height;
+      braceQuads(emit, cx - tip, cy, height, 1);
+      braceQuads(emit, cx + tip, cy, height, -1);
     }
 
     OnPropertyChanged(id, value) {}
@@ -149,16 +168,22 @@ export function lineWidth(px, iDrawParams) {
  * Where the bar and the mark sit inside an object of this size.
  *
  * Exported so the preview script can lay the drawing out exactly as the editor
- * does; keeping a second copy of these proportions is how the two drifted
- * apart before. Returns null when the object is too small to draw anything in,
- * and a null `mark` when only the bar fits.
+ * does. Returns null when the object is too small to draw anything in, and a
+ * null `mark` when only the bar fits.
  */
 export function layout(x, y, w, h) {
   if (w < 12 || h < 12) return null;
 
   const barH = Math.min(h * BAR_HEIGHT, BAR_MAX);
   const bodyH = h - barH;
-  const height = Math.min(w, bodyH) * MARK_HEIGHT;
+
+  // Widthwise the pair is two braces plus the gap, all in brace heights, so a
+  // wide-but-short object shrinks the mark rather than overflowing it.
+  const span = 2 * B_WIDTH + BRACE_GAP;
+  const height = Math.min(
+    Math.min(w, bodyH) * MARK_HEIGHT,
+    (w * MARK_MAX_WIDTH) / span,
+  );
 
   return {
     w,
@@ -171,102 +196,100 @@ export function layout(x, y, w, h) {
             cx: x + w / 2,
             cy: y + barH + bodyH / 2,
             height,
-            braceW: height * BRACE_WIDTH,
-            gap: height * BRACE_GAP,
-            thickness: Math.max(1, height * THICKNESS),
+            gap: BRACE_GAP * height,
           },
   };
+}
+
+/**
+ * Half a chord of a circle of radius `r`, `d` from its centre.
+ *
+ * Clamped at zero: the breakpoints land exactly on the ends of these arcs, and
+ * there r - d is a rounding error either side of nothing, which would take the
+ * square root of a hair-negative number and give NaN.
+ */
+function chord(r, d) {
+  return Math.sqrt(Math.max(0, r * r - d * d));
+}
+
+/** The outer edge of a brace at `u`, measured down from its top. */
+function outerAt(u) {
+  if (u <= END_CY + TOL) return END_CX - chord(END_OUTER_R, END_CY - u);
+  if (u <= WAIST_Y + TOL) return SPINE_OUTER;
+  if (u <= MID_ARM_Y + TOL) return FILLET_CX + chord(FILLET_R, u - WAIST_Y);
+  return 0;
+}
+
+/** The inner edge of a brace at `u`, the side its arms reach towards. */
+function innerAt(u) {
+  if (u < ARM_INNER_Y) return B_WIDTH;
+  if (u <= END_CY + TOL) return END_CX - chord(END_INNER_R, END_CY - u);
+  if (u <= WAIST_Y + TOL) return SPINE_INNER;
+  return INNER_CX + chord(INNER_R, u - WAIST_Y);
+}
+
+/** Both edges at `y`, folded onto the top half since a brace is symmetric. */
+export function braceEdges(y) {
+  const u = y <= 0.5 ? y : 1 - y;
+  return [outerAt(u), innerAt(u)];
+}
+
+/**
+ * The heights to sample a brace at.
+ *
+ * Every place the shape changes construction is included, so no trapezoid ever
+ * spans two of them and cuts a corner. The arm's underside is a genuine
+ * discontinuity in the inner edge - it steps from the arm's end back to the
+ * corner - so that height appears twice, a hair apart, to keep the edge
+ * vertical.
+ */
+export function braceRows(steps = STEPS) {
+  const breaks = [0, ARM_INNER_Y - EPS, ARM_INNER_Y, END_CY, WAIST_Y, MID_ARM_Y, 0.5];
+  const half = [];
+
+  for (let i = 0; i < breaks.length - 1; ++i) {
+    const a = breaks[i];
+    const b = breaks[i + 1];
+    const n = Math.max(1, Math.round((steps * (b - a)) / 0.5));
+    for (let k = 0; k < n; ++k) half.push(a + ((b - a) * k) / n);
+  }
+  half.push(0.5);
+
+  // Each row is [height, sample point]. The bottom half reuses the top half's
+  // sample points rather than folding its heights back, so a mirrored row is
+  // measured at exactly the same place on the profile as its twin.
+  const rows = half.map((u) => [u, u]);
+  for (let i = half.length - 2; i >= 0; --i) rows.push([1 - half[i], half[i]]);
+
+  return rows;
+}
+
+/**
+ * Emit one brace as a strip of trapezoids.
+ *
+ * `tipX` is the middle point and `sign` says which way the arms reach, so the
+ * same function draws both halves of the pair.
+ */
+export function braceQuads(emit, tipX, cy, height, sign, steps = STEPS) {
+  const rows = braceRows(steps);
+  const top = cy - height / 2;
+  const X = (v) => tipX + sign * v * height;
+  const Y = (v) => top + v * height;
+
+  for (let i = 0; i < rows.length - 1; ++i) {
+    const [y0, u0] = rows[i];
+    const [y1, u1] = rows[i + 1];
+    const o0 = outerAt(u0);
+    const n0 = innerAt(u0);
+    const o1 = outerAt(u1);
+    const n1 = innerAt(u1);
+
+    emit(X(o0), Y(y0), X(n0), Y(y0), X(n1), Y(y1), X(o1), Y(y1));
+  }
 }
 
 function rect(iRenderer, x, y, w, h) {
   const q = new SDK.Quad();
   q.setRect(x, y, x + w, y + h);
   iRenderer.Quad(q);
-}
-
-function smoothstep(t) {
-  t = Math.min(1, Math.max(0, t));
-  return t * t * (3 - 2 * t);
-}
-
-/**
- * How far a brace stands out from its tip, `u` being the distance from the
- * middle point to a terminal as a fraction. Three parts: out to the spine,
- * along the spine, then out again into the terminal curl.
- */
-function braceOffset(u, width) {
-  if (u <= TIP_END) return width * SPINE * smoothstep(u / TIP_END);
-  if (u >= CURL_START) {
-    const t = (u - CURL_START) / (1 - CURL_START);
-    return width * (SPINE + (1 - SPINE) * smoothstep(t));
-  }
-  return width * SPINE;
-}
-
-/** The stroke's width at `u`, as a fraction of its widest. */
-function braceWeight(u) {
-  const fromTip = smoothstep(u / TAPER);
-  const fromEnd = smoothstep((1 - u) / TAPER);
-  return THIN + (1 - THIN) * Math.min(fromTip, fromEnd);
-}
-
-/**
- * One brace as a centreline, each point carrying the stroke weight there.
- *
- * `tipX` is where the middle point sits and `sign` says which way the arms
- * open, so the same function draws both halves of the pair.
- */
-export function brace(tipX, cy, height, width, sign) {
-  const points = [];
-  for (let i = 0; i <= STEPS; ++i) {
-    const s = -1 + (2 * i) / STEPS;
-    const u = Math.abs(s);
-    points.push([
-      tipX + sign * braceOffset(u, width),
-      cy + (s * height) / 2,
-      braceWeight(u),
-    ]);
-  }
-  return points;
-}
-
-/**
- * Extrude a centreline into a strip of quads, following the per-point weight.
- *
- * Takes an emit callback rather than the renderer so the geometry can be
- * checked on its own, away from Construct.
- */
-export function ribbon(emit, points, thickness) {
-  const half = thickness / 2;
-
-  // A vertex normal averaged from its neighbours mitres the joins; per-segment
-  // normals would leave a notch on the outside of every bend.
-  const normals = points.map((_, i) => {
-    const [px, py] = points[Math.max(0, i - 1)];
-    const [nx, ny] = points[Math.min(points.length - 1, i + 1)];
-    const dx = nx - px;
-    const dy = ny - py;
-    const len = Math.hypot(dx, dy) || 1;
-    return [-dy / len, dx / len];
-  });
-
-  for (let i = 0; i < points.length - 1; ++i) {
-    const [x1, y1, w1] = points[i];
-    const [x2, y2, w2] = points[i + 1];
-    const [n1x, n1y] = normals[i];
-    const [n2x, n2y] = normals[i + 1];
-    const h1 = half * w1;
-    const h2 = half * w2;
-
-    emit(
-      x1 + n1x * h1,
-      y1 + n1y * h1,
-      x2 + n2x * h2,
-      y2 + n2y * h2,
-      x2 - n2x * h2,
-      y2 - n2y * h2,
-      x1 - n1x * h1,
-      y1 - n1y * h1,
-    );
-  }
 }
