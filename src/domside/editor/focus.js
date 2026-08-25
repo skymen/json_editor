@@ -84,7 +84,9 @@ export function restoreFocus(body, focus) {
 
   if (focus.text !== null && typeof el.value === "string") {
     el.value = focus.text;
-    if (focus.path !== null) el.dispatchEvent(new Event("input"));
+    // Re-parse and re-mark, but do not record it as an edit. Dispatching a
+    // synthetic input event here would be indistinguishable from typing.
+    el._jeRestoreText?.();
   }
 
   if (focus.start !== null && el.setSelectionRange)

@@ -70,13 +70,30 @@
 /* ----------------------------------------------------------------- fields */
 
 .je-val,
-.je-dim,
-.je-keyedit {
+.je-dim {
   padding: 0.1em 0.5em;
   color: var(--je-fg);
   border: none;
   border-radius: var(--je-radius-control);
   background: var(--je-field-bg);
+}
+
+/* A renameable key should read as a key, not as a field: no fill and no
+   padding until it is pointed at. The hover fill is a box-shadow rather than
+   real padding so the text never shifts, which would make every key in the
+   tree twitch as the pointer runs down it. */
+.je-keyedit {
+  padding: 0;
+  color: var(--je-key);
+  border: none;
+  border-radius: var(--je-radius-control);
+  background: none;
+}
+.je-keyedit:hover:enabled,
+.je-keyedit:focus {
+  color: var(--je-field-fg-focus);
+  /* background: var(--je-field-bg);
+  box-shadow: 0 0 0 0.3em var(--je-field-bg); */
 }
 
 /* C3's search fields are pills, unlike every other input. */
@@ -90,26 +107,30 @@
 
 .je-search:hover,
 .je-val:hover:enabled,
-.je-dim:hover:enabled,
-.je-keyedit:hover:enabled {
+.je-dim:hover:enabled {
   background: var(--je-field-bg-hover);
 }
 .je-search:focus,
 .je-val:focus,
-.je-dim:focus,
-.je-keyedit:focus {
+.je-dim:focus {
   color: var(--je-field-fg-focus);
   outline: none;
   background: var(--je-field-bg-focus);
+}
+.je-keyedit:focus {
+  outline: none;
 }
 .je-search::placeholder {
   opacity: 1;
   color: var(--je-placeholder);
 }
-.je-val:disabled,
-.je-keyedit:disabled {
+.je-val:disabled {
   color: var(--je-fg);
   opacity: 0.5;
+}
+.je-keyedit:disabled {
+  color: var(--je-key);
+  opacity: 1;
 }
 
 .je-t-number {

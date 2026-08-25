@@ -1,0 +1,263 @@
+/*
+ * A complete replacement theme: "Blueprint".
+ *
+ * Load this with "Load CSS file" in *replace* mode. That drops the Construct
+ * theme entirely, so nothing describes the editor's appearance except what is
+ * written here - which is the point: this is what owning the whole look means,
+ * as opposed to editor-theme.css, which overrides a handful of variables and
+ * lets the Construct rules do the work.
+ *
+ * layout.css still runs underneath in either mode. It owns where things are:
+ * the flex rows, the tree indent, the c2array grid, the field widths, the
+ * resets. So this file never has to say display, flex, grid, width or height -
+ * only what things look like. That is the whole reason a theme can be short.
+ *
+ * The control language here is deliberately not Construct's:
+ *
+ *   - square corners everywhere, no radius at all
+ *   - fields are underlines rather than filled boxes
+ *   - tabs are plain text with a rule under the active one, no fill
+ *   - rows band alternately, the way a spreadsheet does
+ *   - everything monospaced, including the chrome
+ *
+ * The class names it hangs on are listed at the bottom of editor-theme.css.
+ */
+
+.je {
+  --bp-ink: #d7e4f5;
+  --bp-dim: #6c7f96;
+  --bp-faint: #3d4d61;
+  --bp-line: #24384f;
+  --bp-paper: #0e1a26;
+  --bp-panel: #132433;
+  --bp-accent: #64d2ff;
+  --bp-warn: #ff6b6b;
+
+  color: var(--bp-ink);
+  background: var(--bp-paper);
+  font-family: var(--je-font-mono);
+  border: 1px solid var(--bp-line);
+}
+
+.je-body {
+  padding: 0.5em 0.6em 0.7em 0.6em;
+}
+
+/* ------------------------------------------------------------------- bars */
+
+.je-bar {
+  padding: 0.3em 0.4em;
+  background: var(--bp-panel);
+  border-bottom: 1px solid var(--bp-line);
+}
+
+/* With no tab bar above it the toolbar meets the panel edge, so it takes the
+   space the tabs would otherwise have provided. Replacing the theme means
+   inheriting none of that, so it has to be said here. */
+.je-header > .je-bar:first-child:not(.je-tabbar) {
+  padding-top: 0.55em;
+}
+.je-tabbar {
+  padding-bottom: 0;
+}
+
+/* Tabs are text, marked by a rule rather than a fill. */
+.je-tab {
+  padding: 0.15em 0.8em;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--bp-dim);
+  background: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85em;
+}
+.je-tab:hover:enabled {
+  color: var(--bp-ink);
+  background: none;
+}
+.je-tab.je-on,
+.je-tab.je-on:hover:enabled {
+  color: var(--bp-accent);
+  background: none;
+  border-bottom-color: var(--bp-accent);
+}
+
+.je-close {
+  padding: 0 0.5em;
+  border: none;
+  border-radius: 0;
+  color: var(--bp-dim);
+  background: none;
+}
+.je-close:hover {
+  color: var(--bp-warn);
+  background: none;
+}
+
+/* ----------------------------------------------------------------- fields */
+
+/* Underlines, not boxes. */
+.je-val,
+.je-dim,
+.je-search,
+.je-keyedit {
+  padding: 0.05em 0.25em;
+  color: var(--bp-ink);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--bp-line);
+  border-radius: 0;
+}
+.je-val:hover:enabled,
+.je-dim:hover:enabled,
+.je-search:hover {
+  border-bottom-color: var(--bp-faint);
+}
+.je-val:focus,
+.je-dim:focus,
+.je-search:focus,
+.je-keyedit:focus {
+  outline: none;
+  border-bottom-color: var(--bp-accent);
+  background: rgba(100, 210, 255, 0.06);
+}
+.je-search::placeholder {
+  opacity: 1;
+  color: var(--bp-faint);
+}
+.je-val:disabled {
+  color: var(--bp-dim);
+  border-bottom-color: transparent;
+}
+
+/* A renameable key still reads as a key until it is pointed at. */
+.je-keyedit {
+  border-bottom-color: transparent;
+  color: var(--bp-accent);
+}
+.je-keyedit:hover:enabled {
+  border-bottom-color: var(--bp-faint);
+}
+
+.je-t-number {
+  color: #9ae6b4;
+}
+.je-t-string {
+  color: #f6c177;
+}
+.je-t-keyword {
+  color: #c4a7e7;
+}
+.je-val.je-invalid {
+  color: var(--bp-warn);
+  border-bottom-color: var(--bp-warn);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+/* ------------------------------------------------------------------- tree */
+
+.je-children {
+  border-left: 1px dashed var(--bp-line);
+}
+
+.je-head,
+.je-row {
+  padding: 0.1em 0.3em;
+  border-radius: 0;
+}
+/* Banded rows, like a spreadsheet. */
+.je-children > .je-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+.je-head:hover,
+.je-row:hover {
+  background: rgba(100, 210, 255, 0.09);
+}
+
+.je-caret {
+  color: var(--bp-faint);
+}
+.je-badge {
+  color: var(--bp-dim);
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.je-key {
+  color: var(--bp-accent);
+}
+.je-key.je-hit {
+  color: var(--bp-paper);
+  background: var(--bp-accent);
+}
+.je-idx {
+  color: var(--bp-faint);
+}
+.je-message {
+  padding: 0.4em 0.3em;
+  color: var(--bp-faint);
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.je-btn {
+  padding: 0 0.45em;
+  color: var(--bp-dim);
+  background: none;
+  border: 1px solid var(--bp-line);
+  border-radius: 0;
+  line-height: 1.4;
+}
+.je-btn:hover:enabled {
+  color: var(--bp-ink);
+  border-color: var(--bp-faint);
+  background: none;
+}
+.je-btn:active:enabled {
+  color: var(--bp-paper);
+  background: var(--bp-accent);
+  border-color: var(--bp-accent);
+}
+.je-btn:disabled {
+  opacity: 0.25;
+}
+.je-add:hover:enabled {
+  color: #9ae6b4;
+  border-color: #9ae6b4;
+}
+.je-del:hover:enabled {
+  color: var(--bp-warn);
+  border-color: var(--bp-warn);
+}
+.je-addbar {
+  padding: 0.25em 0.3em 0.1em 0.3em;
+}
+
+/* --------------------------------------------------------------- c2array */
+
+.je-dims,
+.je-zbar,
+.je-col-label {
+  color: var(--bp-dim);
+}
+.je-zbar {
+  padding: 0.2em 0.3em;
+  font-size: 0.85em;
+}
+.je-grid {
+  padding: 0.1em 0.3em;
+}
+
+/* Scroll to path still needs to announce where it landed. */
+@keyframes je-flash {
+  from {
+    background: var(--bp-accent);
+    color: var(--bp-paper);
+  }
+}
+.je-flash {
+  animation: je-flash 1.1s ease-out;
+}

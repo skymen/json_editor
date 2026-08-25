@@ -55,7 +55,16 @@ export function buildValueField(ctx, container, key, path, opts = {}) {
     ctx.notifyFocus(path);
   });
 
-  input.addEventListener("input", () => {
+  /**
+   * Take what is in the field and apply it.
+   *
+   * `record` separates a real keystroke from putting a half-typed value back
+   * into a field that was just rebuilt. Both have to re-parse and re-mark, but
+   * only the keystroke is an edit: queueing on a restore would send an op for
+   * a value nobody touched, whose write comes straight back as fresh data,
+   * restoring the field again - an edit that never stops echoing.
+   */
+  const applyText = (record) => {
     const result = parseValue(input.value, scalarsOnly);
     if (!result.ok) {
       markInvalid(result.error);
@@ -63,8 +72,11 @@ export function buildValueField(ctx, container, key, path, opts = {}) {
     }
     markValid(result.value);
     container[key] = result.value;
-    ctx.queueValue(pathKeys(path), result.value);
-  });
+    if (record) ctx.queueValue(pathKeys(path), result.value);
+  };
+
+  input.addEventListener("input", () => applyText(true));
+  input._jeRestoreText = () => applyText(false);
 
   input.addEventListener("blur", () => {
     if (input.isConnected) ctx.flushPending();
