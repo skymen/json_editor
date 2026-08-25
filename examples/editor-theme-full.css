@@ -1,5 +1,10 @@
 /*
- * A complete replacement theme: "Blueprint".
+ * A complete replacement theme: "Foolscap".
+ *
+ * Warm paper rather than a screen: cream stock with a little grain and some
+ * uneven sun on it, labels in a hand, values on a typewriter, and a yellow
+ * highlighter for search hits. The palette is ink brown with amber, orange and
+ * red picked out of it.
  *
  * Load this with "Load CSS file" in *replace* mode. That drops the Construct
  * theme entirely, so nothing describes the editor's appearance except what is
@@ -9,34 +14,73 @@
  *
  * layout.css still runs underneath in either mode. It owns where things are:
  * the flex rows, the tree indent, the c2array grid, the field widths, the
- * resets. So this file never has to say display, flex, grid, width or height -
- * only what things look like. That is the whole reason a theme can be short.
+ * resets. So this file never says display, flex, grid, width or height - only
+ * what things look like.
  *
- * The control language here is deliberately not Construct's:
+ * Techniques worth stealing:
  *
- *   - square corners everywhere, no radius at all
- *   - fields are underlines rather than filled boxes
- *   - tabs are plain text with a rule under the active one, no fill
- *   - rows band alternately, the way a spreadsheet does
- *   - everything monospaced, including the chrome
+ *   - paper made of stacked gradients, no image: two radials for uneven warmth
+ *     over a fine cross-hatch of repeating-linear-gradients for the fibre
+ *   - the highlighter, as a gradient that stops short of the cap height so it
+ *     sits on the text like a marker stroke rather than a filled box
+ *   - the tree's guide line as a gradient, painted as a background stripe
+ *     since a border cannot hold one
+ *   - glow as a warm bloom: a wide, low-alpha amber box-shadow on focus
  *
  * The class names it hangs on are listed at the bottom of editor-theme.css.
  */
 
 .je {
-  --bp-ink: #d7e4f5;
-  --bp-dim: #6c7f96;
-  --bp-faint: #3d4d61;
-  --bp-line: #24384f;
-  --bp-paper: #0e1a26;
-  --bp-panel: #132433;
-  --bp-accent: #64d2ff;
-  --bp-warn: #ff6b6b;
+  --p-ink: #4a3524; /* fountain pen brown, never pure black */
+  --p-soft: #8a6d52;
+  --p-faint: #b9a288;
+  --p-rule: #d9c4a5;
 
-  color: var(--bp-ink);
-  background: var(--bp-paper);
-  font-family: var(--je-font-mono);
-  border: 1px solid var(--bp-line);
+  --p-amber: #e8a020;
+  --p-orange: #e2620f;
+  --p-red: #c62828;
+  --p-rust: #9c3d10;
+  --p-olive: #8a6d0e;
+  --p-marker: #ffd84d;
+
+  --p-sheet: #fbf3e2;
+  --p-card: #fffaf0;
+
+  /* Labels in a hand, values on a typewriter: the pairing is what sells it,
+     and the typewriter face keeps digits aligned down a column. */
+  --je-font: "Bradley Hand", "Segoe Script", "Ink Free", "Chalkboard SE",
+    "Comic Sans MS", cursive;
+  --je-font-mono: "American Typewriter", "Courier New", Courier, monospace;
+
+  color: var(--p-ink);
+  border-radius: 0.35em;
+
+  /* Paper: sun across the sheet, foxing in the far corner, then the fibre. */
+  background-image:
+    radial-gradient(
+      120% 90% at 12% -10%,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0) 58%
+    ),
+    radial-gradient(
+      85% 70% at 92% 108%,
+      rgba(206, 154, 88, 0.3),
+      rgba(206, 154, 88, 0) 62%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(124, 88, 48, 0.045) 0 1px,
+      rgba(124, 88, 48, 0) 1px 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(124, 88, 48, 0.035) 0 1px,
+      rgba(124, 88, 48, 0) 1px 4px
+    ),
+    linear-gradient(180deg, #fdf7ea, #f4e8d1);
+  box-shadow:
+    inset 0 0 0 1px rgba(154, 116, 72, 0.35),
+    inset 0 0 2.4em rgba(160, 112, 56, 0.14);
 }
 
 .je-body {
@@ -45,159 +89,207 @@
 
 /* ------------------------------------------------------------------- bars */
 
+/* A band of kraft tape across the top of the sheet. */
 .je-bar {
   padding: 0.3em 0.4em;
-  background: var(--bp-panel);
-  border-bottom: 1px solid var(--bp-line);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.75),
+    rgba(214, 176, 122, 0.28)
+  );
+  border-bottom: 1px solid var(--p-rule);
 }
-
-/* With no tab bar above it the toolbar meets the panel edge, so it takes the
+.je-header > .je-bar:first-child {
+  border-radius: 0.35em 0.35em 0 0;
+}
+/* With no tab bar above it the toolbar meets the paper's edge, so it takes the
    space the tabs would otherwise have provided. Replacing the theme means
    inheriting none of that, so it has to be said here. */
 .je-header > .je-bar:first-child:not(.je-tabbar) {
   padding-top: 0.55em;
 }
 .je-tabbar {
-  padding-bottom: 0;
+  padding-bottom: 0.3em;
 }
 
-/* Tabs are text, marked by a rule rather than a fill. */
+/* Tabs as index cards; the open one is a strip of orange washi tape. */
 .je-tab {
-  padding: 0.15em 0.8em;
-  border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  color: var(--bp-dim);
-  background: none;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.85em;
+  padding: 0.15em 0.9em;
+  border: 1px solid rgba(154, 116, 72, 0.3);
+  border-radius: 0.4em 0.4em 0.15em 0.15em;
+  color: var(--p-soft);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(240, 224, 196, 0.7)
+  );
 }
 .je-tab:hover:enabled {
-  color: var(--bp-ink);
-  background: none;
+  color: var(--p-ink);
+  background-image: linear-gradient(180deg, #fffdf7, #f3e4c9);
 }
 .je-tab.je-on,
 .je-tab.je-on:hover:enabled {
-  color: var(--bp-accent);
-  background: none;
-  border-bottom-color: var(--bp-accent);
+  color: #4a2408;
+  border-color: rgba(198, 106, 20, 0.65);
+  background-image: linear-gradient(170deg, var(--p-amber), var(--p-orange));
+  box-shadow: 0 0.12em 0.5em rgba(226, 98, 15, 0.4);
 }
 
 .je-close {
   padding: 0 0.5em;
   border: none;
-  border-radius: 0;
-  color: var(--bp-dim);
+  border-radius: 0.35em;
+  color: var(--p-soft);
   background: none;
 }
 .je-close:hover {
-  color: var(--bp-warn);
-  background: none;
+  color: #fff;
+  background-image: linear-gradient(170deg, #e2453f, var(--p-red));
+  box-shadow: 0 0 0.7em rgba(198, 40, 40, 0.45);
 }
 
 /* ----------------------------------------------------------------- fields */
 
-/* Underlines, not boxes. */
+/* Values sit on little pale cards ruled underneath, like a filled-in form. */
 .je-val,
 .je-dim,
-.je-search,
-.je-keyedit {
-  padding: 0.05em 0.25em;
-  color: var(--bp-ink);
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--bp-line);
-  border-radius: 0;
+.je-search {
+  padding: 0.1em 0.5em;
+  color: var(--p-ink);
+  border: 1px solid rgba(154, 116, 72, 0.28);
+  border-bottom-color: rgba(154, 116, 72, 0.5);
+  border-radius: 0.3em;
+  background-image: linear-gradient(180deg, var(--p-card), #fdf4e4);
 }
+.je-search {
+  border-radius: 999px;
+  padding: 0.1em 0.9em;
+}
+
 .je-val:hover:enabled,
 .je-dim:hover:enabled,
 .je-search:hover {
-  border-bottom-color: var(--bp-faint);
+  border-color: rgba(226, 98, 15, 0.4);
 }
 .je-val:focus,
 .je-dim:focus,
-.je-search:focus,
-.je-keyedit:focus {
+.je-search:focus {
   outline: none;
-  border-bottom-color: var(--bp-accent);
-  background: rgba(100, 210, 255, 0.06);
+  border-color: var(--p-orange);
+  background-image: linear-gradient(180deg, #fffdf8, #fff4df);
+  /* Glow, but on paper: a warm bloom rather than a hard ring. */
+  box-shadow:
+    0 0 0 0.18em rgba(232, 160, 32, 0.28),
+    0 0 1.1em rgba(226, 98, 15, 0.3);
 }
 .je-search::placeholder {
   opacity: 1;
-  color: var(--bp-faint);
+  color: var(--p-faint);
 }
 .je-val:disabled {
-  color: var(--bp-dim);
-  border-bottom-color: transparent;
+  color: var(--p-soft);
+  background-image: none;
+  border-style: dashed;
 }
 
 /* A renameable key still reads as a key until it is pointed at. */
 .je-keyedit {
-  border-bottom-color: transparent;
-  color: var(--bp-accent);
+  padding: 0;
+  border: none;
+  border-radius: 0.25em;
+  color: var(--p-rust);
+  background: none;
 }
-.je-keyedit:hover:enabled {
-  border-bottom-color: var(--bp-faint);
+.je-keyedit:hover:enabled,
+.je-keyedit:focus {
+  outline: none;
+  color: var(--p-ink);
+  background: rgba(232, 160, 32, 0.24);
+  box-shadow: 0 0 0 0.3em rgba(232, 160, 32, 0.24);
 }
 
 .je-t-number {
-  color: #9ae6b4;
+  color: var(--p-orange);
 }
 .je-t-string {
-  color: #f6c177;
+  color: var(--p-olive);
+  font-style: italic; /* strings written in a slanted hand */
 }
 .je-t-keyword {
-  color: #c4a7e7;
+  color: var(--p-red);
+  font-weight: 600;
 }
 .je-val.je-invalid {
-  color: var(--bp-warn);
-  border-bottom-color: var(--bp-warn);
-  background: rgba(255, 107, 107, 0.08);
+  color: #7d1a1a;
+  border-color: var(--p-red);
+  background-image: linear-gradient(180deg, #fff1ef, #ffe1dc);
+  box-shadow: 0 0 0.8em rgba(198, 40, 40, 0.28);
 }
 
 /* ------------------------------------------------------------------- tree */
 
+/* A pencil line down the margin, fading as it goes. */
 .je-children {
-  border-left: 1px dashed var(--bp-line);
+  background: linear-gradient(
+      180deg,
+      rgba(154, 116, 72, 0.5),
+      rgba(154, 116, 72, 0.12)
+    )
+    left / 1px 100% no-repeat;
 }
 
 .je-head,
 .je-row {
   padding: 0.1em 0.3em;
-  border-radius: 0;
-}
-/* Banded rows, like a spreadsheet. */
-.je-children > .je-row:nth-child(even) {
-  background: rgba(255, 255, 255, 0.025);
+  border-radius: 0.3em;
 }
 .je-head:hover,
 .je-row:hover {
-  background: rgba(100, 210, 255, 0.09);
+  background-image: linear-gradient(
+    90deg,
+    rgba(232, 160, 32, 0.2),
+    rgba(232, 160, 32, 0.04)
+  );
 }
 
 .je-caret {
-  color: var(--bp-faint);
+  color: var(--p-orange);
 }
 .je-badge {
-  color: var(--bp-dim);
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--p-faint);
+  font-size: 0.85em;
 }
 .je-key {
-  color: var(--bp-accent);
+  color: var(--p-rust);
 }
+
+/*
+ * The highlighter. The gradient stops short at the top and bottom so the
+ * colour sits across the text like a marker stroke instead of filling a box,
+ * and the ink stays dark rather than being knocked out.
+ */
 .je-key.je-hit {
-  color: var(--bp-paper);
-  background: var(--bp-accent);
+  color: #3b2410;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 216, 77, 0) 12%,
+    var(--p-marker) 12%,
+    #ffe98a 55%,
+    var(--p-marker) 88%,
+    rgba(255, 216, 77, 0) 88%
+  );
+  padding: 0 0.25em;
+  margin: 0 -0.25em;
+  border-radius: 0.1em;
 }
+
 .je-idx {
-  color: var(--bp-faint);
+  color: var(--p-faint);
 }
 .je-message {
   padding: 0.4em 0.3em;
-  color: var(--bp-faint);
+  color: var(--p-faint);
   font-style: italic;
 }
 
@@ -205,32 +297,38 @@
 
 .je-btn {
   padding: 0 0.45em;
-  color: var(--bp-dim);
-  background: none;
-  border: 1px solid var(--bp-line);
-  border-radius: 0;
+  color: var(--p-ink);
+  border: 1px solid rgba(154, 116, 72, 0.35);
+  border-radius: 0.3em;
   line-height: 1.4;
+  background-image: linear-gradient(180deg, #fffaf1, #f0e2c9);
 }
 .je-btn:hover:enabled {
-  color: var(--bp-ink);
-  border-color: var(--bp-faint);
-  background: none;
+  border-color: rgba(226, 98, 15, 0.5);
+  background-image: linear-gradient(180deg, #fff6e4, #ffe6bd);
+  box-shadow: 0 0 0.6em rgba(232, 160, 32, 0.35);
 }
 .je-btn:active:enabled {
-  color: var(--bp-paper);
-  background: var(--bp-accent);
-  border-color: var(--bp-accent);
+  color: #4a2408;
+  border-color: rgba(198, 106, 20, 0.7);
+  background-image: linear-gradient(170deg, var(--p-amber), var(--p-orange));
+  box-shadow: inset 0 0.1em 0.25em rgba(120, 60, 10, 0.35);
 }
 .je-btn:disabled {
-  opacity: 0.25;
+  opacity: 0.4;
+  border-style: dashed;
 }
 .je-add:hover:enabled {
-  color: #9ae6b4;
-  border-color: #9ae6b4;
+  color: #4a2408;
+  border-color: rgba(198, 106, 20, 0.7);
+  background-image: linear-gradient(170deg, #ffd166, var(--p-amber));
+  box-shadow: 0 0 0.7em rgba(232, 160, 32, 0.55);
 }
 .je-del:hover:enabled {
-  color: var(--bp-warn);
-  border-color: var(--bp-warn);
+  color: #fff;
+  border-color: rgba(160, 30, 30, 0.7);
+  background-image: linear-gradient(170deg, #e2453f, var(--p-red));
+  box-shadow: 0 0 0.7em rgba(198, 40, 40, 0.45);
 }
 .je-addbar {
   padding: 0.25em 0.3em 0.1em 0.3em;
@@ -241,21 +339,25 @@
 .je-dims,
 .je-zbar,
 .je-col-label {
-  color: var(--bp-dim);
+  color: var(--p-soft);
 }
 .je-zbar {
   padding: 0.2em 0.3em;
-  font-size: 0.85em;
+  font-size: 0.9em;
 }
 .je-grid {
   padding: 0.1em 0.3em;
 }
+.je-col-label {
+  font-size: 0.85em;
+}
 
-/* Scroll to path still needs to announce where it landed. */
+/* Scroll to path lands with a swipe of the highlighter. */
 @keyframes je-flash {
   from {
-    background: var(--bp-accent);
-    color: var(--bp-paper);
+    background-image: linear-gradient(170deg, var(--p-marker), var(--p-amber));
+    color: #3b2410;
+    box-shadow: 0 0 1.4em rgba(232, 160, 32, 0.85);
   }
 }
 .je-flash {

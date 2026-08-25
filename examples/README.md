@@ -28,10 +28,11 @@ CSS** property, or load it at runtime with **Load CSS file**.
 
 ## editor-theme-full.css
 
-The deep end: a complete replacement look, "Blueprint". Loaded in *replace*
+The deep end: a complete replacement look, "Foolscap". Loaded in *replace*
 mode it drops the Construct theme entirely and describes everything itself —
-square corners, fields as underlines rather than filled boxes, tabs as plain
-text with a rule under the active one, banded rows, monospaced chrome.
+warm paper built from stacked gradients rather than an image, labels in a hand
+and values on a typewriter, a yellow highlighter across search hits, and a warm
+bloom instead of a hard focus ring.
 
 It is worth reading next to `editor-theme.css` to see where the line falls.
 `layout.css` still runs underneath in both cases and owns where things are: the
