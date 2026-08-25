@@ -3,5 +3,10 @@
     "added": "Initial release.",
     "changed": "",
     "fixed": ""
+  },
+  "1.1.0.0": {
+    "added": "",
+    "changed": "- Better example, fixed a few UX issues, rendering and polished the addon a bit more.",
+    "fixed": ""
   }
 }
