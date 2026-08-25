@@ -6,6 +6,8 @@ const DEFAULT_SIZE = [400, 300];
 const PANEL = [0x57 / 255, 0x57 / 255, 0x57 / 255]; // gray11, dialog body
 const BAR = [0x5e / 255, 0x5e / 255, 0x5e / 255]; // gray12, dialog caption
 const MARK = [0x29 / 255, 0xf3 / 255, 0xd0 / 255]; // the accent teal
+const EDGE = [0x17 / 255, 0x17 / 255, 0x17 / 255]; // gray3, C3's dialog border
+const EDGE_WIDTH = 1;
 
 const BAR_HEIGHT = 0.13; // of the object height
 const BAR_MAX = 22; // but never taller than this
@@ -60,36 +62,41 @@ export default function (instanceClass) {
       this._inst.SetSize(...DEFAULT_SIZE);
     }
 
-    Draw(iRenderer) {
+    Draw(iRenderer, iDrawParams) {
       this._inst.ApplyBlendMode(iRenderer);
       iRenderer.SetColorFillMode();
 
       const quad = this._inst.GetQuad();
-      const x = quad.getTlx();
-      const y = quad.getTly();
-      const w = this._inst.GetWidth();
-      const h = this._inst.GetHeight();
 
       iRenderer.SetColorRgba(PANEL[0], PANEL[1], PANEL[2], 1);
       iRenderer.Quad(quad);
 
-      if (w < 12 || h < 12) return;
+      this._drawContents(iRenderer, quad);
 
-      const barH = Math.min(h * BAR_HEIGHT, BAR_MAX);
+      // Last, so it sits over the bar and the mark instead of being painted
+      // under them, and so it is drawn even when the instance is too small for
+      // anything else. C3 gives a dialog a 4px rgba(23,23,23,.7) border; this
+      // is the same colour, thinner so it does not swallow a small object.
+      //
+      iRenderer.SetColorRgba(EDGE[0], EDGE[1], EDGE[2], 1);
+      iRenderer.PushLineWidth(lineWidth(EDGE_WIDTH, iDrawParams));
+      iRenderer.PushLineCap("square");
+      iRenderer.LineQuad(quad);
+      iRenderer.PopLineWidth();
+      iRenderer.PopLineCap();
+    }
+
+    _drawContents(iRenderer, quad) {
+      const x = quad.getTlx();
+      const y = quad.getTly();
+      const g = layout(x, y, this._inst.GetWidth(), this._inst.GetHeight());
+      if (!g) return;
+
       iRenderer.SetColorRgba(BAR[0], BAR[1], BAR[2], 1);
-      rect(iRenderer, x, y, w, barH);
+      rect(iRenderer, x, y, g.w, g.barH);
 
-      // Centred in what is left below the bar.
-      const bodyH = h - barH;
-      const cx = x + w / 2;
-      const cy = y + barH + bodyH / 2;
-
-      const height = Math.min(w, bodyH) * MARK_HEIGHT;
-      if (height < 6) return;
-
-      const braceW = height * BRACE_WIDTH;
-      const gap = height * BRACE_GAP;
-      const thickness = Math.max(1, height * THICKNESS);
+      if (!g.mark) return;
+      const { cx, cy, height, braceW, gap, thickness } = g.mark;
 
       iRenderer.SetColorRgba(MARK[0], MARK[1], MARK[2], 1);
       const emit = (...corners) => iRenderer.Quad2(...corners);
@@ -106,6 +113,68 @@ export default function (instanceClass) {
     }
 
     OnPropertyChanged(id, value) {}
+  };
+}
+
+/**
+ * A line width in layout units that comes out `px` screen pixels thick.
+ *
+ * The renderer builds line geometry straight from its width in whatever space
+ * is current - LineQuad is quads of 0.5 * lineWidth - so a fixed width is in
+ * layout units and thickens as the view zooms in. Construct compensates for
+ * this itself when it sets the layout view's base width, and this is that same
+ * calculation:
+ *
+ *   f = Math.floor(dpr) / dpr / zoom     (dpr < 1: 1 / dpr / zoom)
+ *
+ * Dividing by the zoom is what holds the width steady; the dpr term snaps it
+ * to whole device pixels so it stays crisp on fractional-ratio displays.
+ *
+ * Note this uses GetZoomFactor rather than LayoutToClientDeviceX, which folds
+ * in devicePixelRatio and would give device pixels, not screen pixels.
+ */
+export function lineWidth(px, iDrawParams) {
+  const view = iDrawParams?.GetLayoutView?.();
+  const reported =
+    typeof view?.GetZoomFactor === "function" ? view.GetZoomFactor() : 1;
+  const zoom = Number.isFinite(reported) && reported > 0 ? reported : 1;
+
+  const dpr = globalThis.devicePixelRatio || 1;
+  const snap = dpr < 1 ? 1 / dpr : Math.floor(dpr) / dpr;
+
+  return (px * snap) / zoom;
+}
+
+/**
+ * Where the bar and the mark sit inside an object of this size.
+ *
+ * Exported so the preview script can lay the drawing out exactly as the editor
+ * does; keeping a second copy of these proportions is how the two drifted
+ * apart before. Returns null when the object is too small to draw anything in,
+ * and a null `mark` when only the bar fits.
+ */
+export function layout(x, y, w, h) {
+  if (w < 12 || h < 12) return null;
+
+  const barH = Math.min(h * BAR_HEIGHT, BAR_MAX);
+  const bodyH = h - barH;
+  const height = Math.min(w, bodyH) * MARK_HEIGHT;
+
+  return {
+    w,
+    h,
+    barH,
+    mark:
+      height < 6
+        ? null
+        : {
+            cx: x + w / 2,
+            cy: y + barH + bodyH / 2,
+            height,
+            braceW: height * BRACE_WIDTH,
+            gap: height * BRACE_GAP,
+            thickness: Math.max(1, height * THICKNESS),
+          },
   };
 }
 
