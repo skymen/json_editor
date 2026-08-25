@@ -71,6 +71,7 @@ export class Editor {
 
     this._flashTimer = 0;
     this._flashed = null;
+    this._fixedPerms = null;
 
     // Window level, so a release outside the element still counts. It also
     // self-detaches once the host is gone, which covers a teardown that never
@@ -176,8 +177,32 @@ export class Editor {
     this._styles.applyCss(css, mode);
   }
 
+  /**
+   * The permissions in force for the tab being shown.
+   *
+   * A tab whose source has a fixed shape - the global variables projection -
+   * gets every structural flag masked off, however the editor is configured.
+   * Adding a key there would be silently dropped on write, so the add bars,
+   * remove buttons and editable key names are simply not built.
+   */
   get perms() {
-    return this._config.permissions;
+    const base = this._config.permissions;
+    if (this.tabs.isStructural()) return base;
+
+    if (this._fixedPerms?.from !== base) {
+      this._fixedPerms = {
+        from: base,
+        perms: {
+          ...base,
+          objectKeys: false,
+          renameKeys: false,
+          arrayElements: false,
+          reorder: false,
+          resizeC2Array: false,
+        },
+      };
+    }
+    return this._fixedPerms.perms;
   }
 
   get detect() {

@@ -324,12 +324,26 @@ export default function (parentClass) {
         this._activeTab = this._tabs[0].id;
 
       this._postToDOMElement(MSG.TABS, {
-        tabs: this._tabs.map((t) => ({ id: t.id, label: t.label })),
+        // A project's set of globals is fixed at build time: keys cannot be
+        // added, removed or renamed, and the source ignores any attempt. The
+        // editor is told so it can leave those controls out rather than offer
+        // buttons that quietly do nothing.
+        tabs: this._tabs.map((t) => ({
+          id: t.id,
+          label: t.label,
+          structural: t.kind !== GLOBALS,
+        })),
         activeId: this._activeTab,
       });
     }
 
+    /**
+     * A tab's binding changed. Re-post the tab list as well as re-reading:
+     * switching a tab to or from global variables changes whether its
+     * structure can be edited, and the DOM side learns that from the list.
+     */
     _rebind(tab) {
+      this._postTabs();
       this._sync.invalidate(tab.id);
       this._sync.poll();
     }
@@ -390,7 +404,6 @@ export default function (parentClass) {
       Object.assign(tab, binding);
 
       if (!existing) this._tabs.push(tab);
-      this._postTabs();
       this._rebind(tab);
     }
 

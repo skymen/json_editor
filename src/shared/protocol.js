@@ -13,7 +13,7 @@
 
 export const MSG = {
   CONFIG: "config",
-  TABS: "tabs",
+  TABS: "tabs", // { tabs: [{ id, label, structural }], activeId }
   DATA: "data",
   STYLE: "style",
   COMMAND: "command",
