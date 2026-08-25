@@ -1,14 +1,14 @@
 <img src="./examples/cover.png" width="150" /><br>
 # JSON Editor
 <i>An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.</i> <br>
-### Version 1.1.0.0
+### Version 1.1.1.0
 
-[<img src="https://placehold.co/200x50/4493f8/FFF?text=Download&font=montserrat" width="200"/>](https://github.com/skymen/json_editor/releases/download/skymen_JSONEditor-1.1.0.0.c3addon/skymen_JSONEditor-1.1.0.0.c3addon)
+[<img src="https://placehold.co/200x50/4493f8/FFF?text=Download&font=montserrat" width="200"/>](https://github.com/skymen/json_editor/releases/download/skymen_JSONEditor-1.1.1.0.c3addon/skymen_JSONEditor-1.1.1.0.c3addon)
 <br>
 <sub> [See all releases](https://github.com/skymen/json_editor/releases) </sub> <br>
 
-#### What's New in 1.1.0.0
-- **Changed:** - Better example, fixed a few UX issues, rendering and polished the addon a bit more.
+#### What's New in 1.1.1.0
+- **Changed:** UI now scales with C3 canvas scale
 
 <sub>[View full changelog](#changelog)</sub>
 
@@ -73,7 +73,7 @@ npm run dev
 | Custom CSS | A CSS file from the project's Files folder, loaded on startup. | projectfile |
 | Custom CSS mode | Whether the custom CSS file adds to the built-in theme, so it only has to override what it wants, or replaces it outright. | combo |
 | Top bar | Which controls the editor shows, and what closing it does. | group |
-| UI scale | Multiplies the base font size the whole editor is laid out in. The editor already follows the game's display scale, so this is a size preference on top of that, not a substitute for it. | float |
+| UI scale | Multiplies the base font size the whole editor is laid out in. | float |
 | Tab bar | When to show the tab bar. | combo |
 | Show filter box | Show the key filter input in the toolbar. | check |
 | Show collapse all | Show the Collapse all button in the toolbar. | check |
@@ -109,7 +109,7 @@ npm run dev
 | Set show c2array z plane bar | Whether the z plane selector is shown on a c2array deeper than one plane. | Enabled             *(boolean)* <br> |
 | Set close behaviour | What the close button does after flushing pending edits. On close clicked fires either way. | Behaviour             *(combo)* <br> |
 | Set tab bar | When the tab bar should be shown. | Mode             *(combo)* <br> |
-| Set UI scale | Multiply the base font size the whole editor is laid out in. Everything is sized in em, so this scales the tree as a whole. It stacks on top of the game's display scale, which the editor already follows. | Scale             *(number)* <br> |
+| Set UI scale | Multiply the base font size the whole editor is laid out in. Everything is sized in em, so this scales the tree as a whole. | Scale             *(number)* <br> |
 | Show close button | Whether a close button is shown in the tab bar. | Visible             *(boolean)* <br> |
 | Show collapse all | Whether the Collapse all button is shown in the toolbar. | Visible             *(boolean)* <br> |
 | Show filter box | Whether the key filter input is shown in the toolbar. | Visible             *(boolean)* <br> |
@@ -169,6 +169,9 @@ npm run dev
 
 ---
 ## Changelog
+
+**1.1.1.0**
+- **Changed:** UI now scales with C3 canvas scale
 
 **1.1.0.0**
 - **Changed:** - Better example, fixed a few UX issues, rendering and polished the addon a bit more.

@@ -8,5 +8,10 @@
     "added": "",
     "changed": "- Better example, fixed a few UX issues, rendering and polished the addon a bit more.",
     "fixed": ""
+  },
+  "1.1.1.0": {
+    "added": "",
+    "changed": "UI now scales with C3 canvas scale",
+    "fixed": ""
   }
 }
