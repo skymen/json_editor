@@ -1,14 +1,15 @@
 <img src="./examples/cover.png" width="150" /><br>
 # JSON Editor
 <i>An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.</i> <br>
-### Version 1.1.1.1
+### Version 1.2.0.0
 
-[<img src="https://placehold.co/200x50/4493f8/FFF?text=Download&font=montserrat" width="200"/>](https://github.com/skymen/json_editor/releases/download/skymen_JSONEditor-1.1.1.1.c3addon/skymen_JSONEditor-1.1.1.1.c3addon)
+[<img src="https://placehold.co/200x50/4493f8/FFF?text=Download&font=montserrat" width="200"/>](https://github.com/skymen/json_editor/releases/download/skymen_JSONEditor-1.2.0.0.c3addon/skymen_JSONEditor-1.2.0.0.c3addon)
 <br>
 <sub> [See all releases](https://github.com/skymen/json_editor/releases) </sub> <br>
 
-#### What's New in 1.1.1.1
-- **Added:** github link
+#### What's New in 1.2.0.0
+- **Added:** Customiseable action buttons
+- **Changed:** ACEs now use autocomplete IDs
 
 <sub>[View full changelog](#changelog)</sub>
 
@@ -178,6 +179,10 @@ npm run dev
 
 ---
 ## Changelog
+
+**1.2.0.0**
+- **Added:** Customiseable action buttons
+- **Changed:** ACEs now use autocomplete IDs
 
 **1.1.1.1**
 - **Added:** github link

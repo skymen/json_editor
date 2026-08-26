@@ -18,5 +18,10 @@
     "added": "github link",
     "changed": "",
     "fixed": ""
+  },
+  "1.2.0.0": {
+    "added": "Customiseable action buttons",
+    "changed": "ACEs now use autocomplete IDs",
+    "fixed": ""
   }
 }
