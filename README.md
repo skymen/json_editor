@@ -186,7 +186,7 @@ npm run dev
 - **Changed:** UI now scales with C3 canvas scale
 
 **1.1.0.0**
-- **Changed:** - Better example, fixed a few UX issues, rendering and polished the addon a bit more.
+- **Changed:** Better example, fixed a few UX issues, rendering and polished the addon a bit more.
 
 **1.0.0.0**
 - **Added:** Initial release.

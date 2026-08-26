@@ -38,33 +38,25 @@ jobs:
       - name: Extract changelog for version
         id: changelog
         run: |
-          if [ -f "CHANGELOG.json" ]; then
-            version="${{ steps.getfile.outputs.version }}"
-            # Extract changelog for this version from JSON
-            changelog=$(node -e "
-              const fs = require('fs');
-              const data = JSON.parse(fs.readFileSync('CHANGELOG.json', 'utf-8'));
-              if (data['$version']) {
-                const v = data['$version'];
-                let output = [];
-                if (v.added) output.push('**Added:**\\n' + v.added);
-                if (v.changed) output.push('**Changed:**\\n' + v.changed);
-                if (v.fixed) output.push('**Fixed:**\\n' + v.fixed);
-                console.log(output.join('\\n\\n'));
-              }
-            ")
-            if [ -n "$changelog" ]; then
-              echo "Found changelog for version ${{ steps.getfile.outputs.version }}"
-              echo "changelog<<EOF" >> $GITHUB_OUTPUT
-              echo "$changelog" >> $GITHUB_OUTPUT
-              echo "EOF" >> $GITHUB_OUTPUT
-              echo "has_changelog=true" >> $GITHUB_OUTPUT
-            else
-              echo "No changelog entry found for this version"
-              echo "has_changelog=false" >> $GITHUB_OUTPUT
-            fi
+          version="${{ steps.getfile.outputs.version }}"
+
+          # Markdown for the GitHub release, BBCode for the Construct addon
+          # page. Same entries, rendered twice; the BBCode one is also cut to
+          # whatever the Construct field will take.
+          node build/changelog.js --version="$version" --format=markdown > /tmp/notes.md
+          node build/changelog.js --version="$version" --format=bbcode \
+            --limit="$(node -e "import('./buildconfig.js').then(m => console.log(m.publishConfig?.releaseNotesLimit ?? 0))")" \
+            > /tmp/notes.bbcode
+
+          if [ -s /tmp/notes.md ]; then
+            echo "Found changelog for version $version"
+            echo "has_changelog=true" >> $GITHUB_OUTPUT
+            echo "changelog<<CHANGELOG_EOF" >> $GITHUB_OUTPUT
+            cat /tmp/notes.md >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "CHANGELOG_EOF" >> $GITHUB_OUTPUT
           else
-            echo "No CHANGELOG.json file found"
+            echo "No changelog entry found for version $version"
             echo "has_changelog=false" >> $GITHUB_OUTPUT
           fi
 
@@ -113,8 +105,8 @@ jobs:
       - name: Publish to Construct 3
         if: steps.check.outputs.publish == 'true' && steps.url.outputs.url != ''
         run: |
-          if [ "${{ steps.changelog.outputs.has_changelog }}" = "true" ]; then
-            release_notes="${{ steps.changelog.outputs.changelog }}"
+          if [ -s /tmp/notes.bbcode ]; then
+            release_notes="$(cat /tmp/notes.bbcode)"
           else
             release_notes="Released via GitHub Actions"
           fi
