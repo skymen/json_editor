@@ -23,7 +23,6 @@
     "init": "npm install && node build/init.js",
     "generateDocs": "cd build && node generateDocumentation.js",
     "publish": "cd build && node publish.js",
-    "setupPublish": "cd build && node setupPublish.js",
-    "backportWorkflow": "cd build && node backportWorkflow.js"
+    "setupPublish": "cd build && node setupPublish.js"
   }
 }

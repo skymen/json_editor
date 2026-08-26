@@ -148,6 +148,9 @@ export default function (parentClass) {
         filter: !!props["show-filter"],
         collapseAll: !!props["show-collapse-all"],
         close: !!props["show-close"],
+        // Not a property: action buttons only ever come from events. It still
+        // has to be carried across, because this replaces the whole object.
+        actions: config.chrome.actions ?? [],
       };
 
       config.tuning = {
