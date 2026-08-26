@@ -1,19 +1,24 @@
 // Applying an edit op to a document.
 //
+// Shared rather than runtime-only: the runtime applies ops to the real source,
+// and the DOM side replays the ones it has queued but not yet sent so that a
+// button reading the document sees what is on screen rather than the last
+// version the runtime echoed back.
+//
 // Ops arrive from the DOM side naming their target with a key array. Resolving
 // that array is the only place that has to know a c2array or c2dictionary can
 // be stored as a *string*: the walk steps into such a value transparently and
 // re-serialises it on the way back out, so no op carries a special case for it.
 
-import { OP } from "../shared/protocol.js";
-import { isContainer, moveIn } from "../shared/jsonUtils.js";
+import { OP } from "./protocol.js";
+import { isContainer, moveIn } from "./jsonUtils.js";
 import {
   detectC2Wrapper,
   c2Dimensions,
   resizeC2Array,
   removeC2Column,
-} from "../shared/c2formats.js";
-import { toPublicPath, pathFromKeys } from "../shared/paths.js";
+} from "./c2formats.js";
+import { toPublicPath, pathFromKeys } from "./paths.js";
 
 function normaliseKey(container, key) {
   return Array.isArray(container) ? Number(key) : key;

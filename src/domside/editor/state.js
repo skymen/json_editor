@@ -46,6 +46,7 @@ export class TabSet {
     this._order = [];
     this._labels = new Map();
     this._structural = new Map();
+    this._kinds = new Map();
     this._active = null;
   }
 
@@ -65,6 +66,11 @@ export class TabSet {
     return this._labels.get(id) ?? id;
   }
 
+  /** What the tab's source resolved to: json, array, dictionary or globals. */
+  kindOf(id = this._active) {
+    return this._kinds.get(id) ?? "json";
+  }
+
   /** Whether this tab's source can have keys added, removed or renamed. */
   isStructural(id = this._active) {
     return this._structural.get(id) !== false;
@@ -78,13 +84,14 @@ export class TabSet {
     return this._states.get(id) ?? null;
   }
 
-  add(id, label, structural = true) {
+  add(id, label, structural = true, kind = "json") {
     if (!this._states.has(id)) {
       this._states.set(id, new TabState());
       this._order.push(id);
     }
     this._labels.set(id, label ?? id);
     this._structural.set(id, structural !== false);
+    this._kinds.set(id, kind ?? "json");
     if (this._active === null) this._active = id;
   }
 
@@ -93,6 +100,7 @@ export class TabSet {
     this._states.delete(id);
     this._labels.delete(id);
     this._structural.delete(id);
+    this._kinds.delete(id);
     this._order = this._order.filter((x) => x !== id);
     if (this._active === id) this._active = this._order[0] ?? null;
   }
@@ -101,6 +109,7 @@ export class TabSet {
     this._states.clear();
     this._labels.clear();
     this._structural.clear();
+    this._kinds.clear();
     this._order = [];
     this._active = null;
   }
@@ -120,7 +129,8 @@ export class TabSet {
     for (const id of this._order.slice())
       if (!wanted.has(id)) this.remove(id);
 
-    for (const tab of tabs) this.add(tab.id, tab.label, tab.structural);
+    for (const tab of tabs)
+      this.add(tab.id, tab.label, tab.structural, tab.kind);
     this._order = tabs.map((t) => t.id);
 
     const before = this._active;

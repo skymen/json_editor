@@ -12,6 +12,7 @@ export const config = {
       desc: "A name for this tab, used by the other tab actions.",
       type: "string",
       initialValue: '"save"',
+      autocompleteId: "jsoneditor-tab",
     },
     {
       id: "label",

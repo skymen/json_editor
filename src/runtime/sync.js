@@ -14,7 +14,7 @@
 // side; nothing else knows the shape of what travels.
 
 import { readSource, writeSource } from "./sources/index.js";
-import { applyOp } from "./ops.js";
+import { applyOp } from "../shared/ops.js";
 import { MSG } from "../shared/protocol.js";
 
 export class SyncEngine {
@@ -64,6 +64,18 @@ export class SyncEngine {
     this._snapshots.set(tab.id, serialized);
 
     this._post(MSG.DATA, { tabId: tab.id, doc, serialized });
+  }
+
+  /**
+   * Replace a tab's whole document.
+   *
+   * Kept apart from applyOp because an op mutates the document it was handed
+   * and reports what it changed, which a wholesale replacement has neither a
+   * path nor an old value for. Import and Clear are the only two callers.
+   */
+  replaceDoc(tab, doc) {
+    writeSource(tab.kind, this._getInstance(tab), doc, this._getRuntime());
+    this.invalidate(tab.id);
   }
 
   /**

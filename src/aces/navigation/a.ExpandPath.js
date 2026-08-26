@@ -11,6 +11,7 @@ export const config = {
       desc: 'A dot separated path, as the JSON plugin writes them, such as "player.inventory.2.name".',
       type: "string",
       initialValue: '""',
+      autocompleteId: "jsoneditor-path",
     },
   ],
 };

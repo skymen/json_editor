@@ -11,6 +11,7 @@ export const config = {
       desc: "The tab to show.",
       type: "string",
       initialValue: '""',
+      autocompleteId: "jsoneditor-tab",
     },
   ],
 };

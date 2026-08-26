@@ -15,6 +15,7 @@ export const config = {
       desc: "The name of a .css file in the project's Files folder.",
       type: "string",
       initialValue: '"editor-theme.css"',
+      autocompleteId: "jsoneditor-css-file",
     },
     {
       id: "mode",

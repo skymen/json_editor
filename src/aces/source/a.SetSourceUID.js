@@ -19,6 +19,7 @@ export const config = {
       desc: "Which tab to change. Leave empty for the current tab.",
       type: "string",
       initialValue: '""',
+      autocompleteId: "jsoneditor-tab",
     },
   ],
 };

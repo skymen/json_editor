@@ -11,6 +11,14 @@ import {
   defaultConfig,
 } from "../shared/protocol.js";
 import { publicPathKeys } from "../shared/paths.js";
+import { detectSource } from "./sources/index.js";
+import {
+  ACTION_KIND_IDS,
+  ACTION_CLEAR,
+  ACTION_IMPORT,
+  actionKind,
+  emptyDocFor,
+} from "../shared/actionButtons.js";
 import {
   fromCombo,
   ADD_BUTTON_MODES,
@@ -71,6 +79,7 @@ export default function (parentClass) {
       this._lastValue = "";
       this._lastOldValue = "";
       this._lastTabId = "";
+      this._lastActionId = "";
       this._filterText = "";
       this._viewState = null;
 
@@ -265,6 +274,10 @@ export default function (parentClass) {
           this._trigger("OnTabSelected");
           break;
 
+        case EVENT.ACTION:
+          this._onAction(payload);
+          break;
+
         case EVENT.CLOSE:
           this._onClose();
           break;
@@ -276,6 +289,42 @@ export default function (parentClass) {
         default:
           break;
       }
+    }
+
+    /**
+     * A button in one of the action bars was pressed.
+     *
+     * Copy, Save and Import all happen on the DOM side, where the clipboard and
+     * the file dialogs are; Import only comes back here to have the document it
+     * read written to the source. Clear is the other way round: emptying needs
+     * to know what the source is, so the DOM side only reports the press.
+     */
+    _onAction(payload) {
+      const id = payload["id"] ?? "";
+      const tab = this._tabById(payload["tabId"] ?? this._activeTab);
+      const kind = payload["kind"] ?? "";
+
+      this._lastActionId = id;
+      if (tab) this._lastTabId = tab.id;
+
+      let replaced = false;
+
+      if (tab && kind === ACTION_IMPORT && payload["doc"] !== undefined) {
+        this._sync.replaceDoc(tab, payload["doc"]);
+        replaced = true;
+      } else if (tab && kind === ACTION_CLEAR) {
+        const doc = emptyDocFor(this._sourceKindOf(tab));
+        if (doc !== null) {
+          this._sync.replaceDoc(tab, doc);
+          replaced = true;
+        }
+      }
+
+      if (replaced) this._sync.poll();
+
+      this._trigger("OnActionButtonClicked");
+      this._trigger("OnAnyActionButtonClicked");
+      if (replaced) this._trigger("OnAnyEdit");
     }
 
     _onClose() {
@@ -319,6 +368,14 @@ export default function (parentClass) {
       return objectClass ? objectClass.getFirstInstance() : null;
     }
 
+    /** What a tab's source turned out to be, once "auto" has been resolved. */
+    _sourceKindOf(tab) {
+      if (!tab) return "json";
+      if (tab.kind === GLOBALS) return "globals";
+      if (tab.kind !== AUTO) return tab.kind;
+      return detectSource(this._instanceFor(tab))?.kind ?? "json";
+    }
+
     _postTabs() {
       if (this._tabs.length && !this._tabById(this._activeTab))
         this._activeTab = this._tabs[0].id;
@@ -332,6 +389,10 @@ export default function (parentClass) {
           id: t.id,
           label: t.label,
           structural: t.kind !== GLOBALS,
+          // The kind a tab names may be "auto", but the buttons need to know
+          // what it actually resolved to before they can offer to empty or
+          // replace it, so it is worked out here rather than on the DOM side.
+          kind: this._sourceKindOf(t),
         })),
         activeId: this._activeTab,
       });
@@ -512,6 +573,53 @@ export default function (parentClass) {
       this._pushConfig();
     }
 
+    // ----------------------------------------- action buttons, exposed to ACEs
+
+    /**
+     * Add a button to one of the action bars, or reconfigure one that is
+     * already there. An empty `tab` puts it on every tab; naming a tab moves it
+     * to the second bar, which only shows while that tab is open.
+     *
+     * Save writes under the label of whichever tab is open, so there is nothing
+     * to configure here: a button shown on every tab would need a name per tab
+     * anyway, and the label is already the name the user sees for that data.
+     */
+    addActionButton(buttonId, label, kind, tab) {
+      const id = String(buttonId ?? "").trim();
+      if (!id) return;
+
+      const resolved = fromCombo(ACTION_KIND_IDS, kind);
+      const button = {
+        id,
+        label: String(label ?? "").trim() || actionKind(resolved).defaultLabel,
+        kind: resolved,
+        tab: String(tab ?? "").trim(),
+      };
+
+      const actions = this._config.chrome.actions;
+      const at = actions.findIndex((a) => a.id === id);
+      if (at === -1) actions.push(button);
+      else actions[at] = button;
+
+      this._pushConfig();
+    }
+
+    removeActionButton(buttonId) {
+      const id = String(buttonId ?? "").trim();
+      const actions = this._config.chrome.actions;
+      const at = actions.findIndex((a) => a.id === id);
+      if (at === -1) return;
+
+      actions.splice(at, 1);
+      this._pushConfig();
+    }
+
+    clearActionButtons() {
+      if (!this._config.chrome.actions.length) return;
+      this._config.chrome.actions = [];
+      this._pushConfig();
+    }
+
     setCloseBehaviour(mode) {
       this._closeBehaviour = fromCombo(CLOSE_BEHAVIOURS, mode);
     }
@@ -564,6 +672,10 @@ export default function (parentClass) {
 
     get lastTabId() {
       return this._lastTabId;
+    }
+
+    get lastActionId() {
+      return this._lastActionId;
     }
 
     get currentTab() {
@@ -640,6 +752,7 @@ export default function (parentClass) {
         theme: this._theme,
         themeCss: this._themeCss,
         customCss: this._customCss,
+        actions: this._config.chrome.actions,
         viewState: this._viewState,
       };
     }
@@ -650,7 +763,12 @@ export default function (parentClass) {
       this._theme = o["theme"] ?? this._theme;
       this._themeCss = o["themeCss"] ?? null;
       this._customCss = o["customCss"] ?? "";
+      this._config.chrome.actions = Array.isArray(o["actions"])
+        ? o["actions"]
+        : [];
       this._viewState = o["viewState"] ?? null;
+
+      this._pushConfig();
 
       this._postTabs();
 

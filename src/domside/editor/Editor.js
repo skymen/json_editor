@@ -8,7 +8,12 @@ import { TabSet } from "./state.js";
 import { computeFilter, keyMatches } from "./filter.js";
 import { captureFocus, restoreFocus, findFieldByPath } from "./focus.js";
 import { make } from "./dom.js";
-import { buildTabBar, buildToolbar } from "./views/toolbar.js";
+import {
+  buildTabBar,
+  buildToolbar,
+  buildActionBar,
+} from "./views/toolbar.js";
+import { runBuiltIn } from "./actions.js";
 import { fillObjectChildren } from "./views/objectView.js";
 import { fillListHead, fillListChildren } from "./views/arrayView.js";
 import {
@@ -19,6 +24,7 @@ import { fillC2DictHead, fillC2DictChildren } from "./views/c2dictView.js";
 import { isContainer, formatValue } from "../../shared/jsonUtils.js";
 import { detectC2Wrapper, C2_ARRAY, C2_DICT } from "../../shared/c2formats.js";
 import { defaultConfig, OP, EVENT, COMMAND } from "../../shared/protocol.js";
+import { applyOp } from "../../shared/ops.js";
 import { SEP, ROOT_PATH, pathFromKeys, toPublicPath } from "../../shared/paths.js";
 
 const CONTROL_SELECTOR = "input, textarea, button, select";
@@ -406,7 +412,8 @@ export class Editor {
     if (payload.active && this.tabs.has(payload.active))
       this.tabs.select(payload.active);
 
-    this._syncTabButtons();
+    if (this._hasScopedActions()) this._renderHeader();
+    else this._syncTabButtons();
     if (this._search) this._search.value = this.state?.query ?? "";
     this._render();
     this._host.scrollTop = this.state?.scrollTop ?? 0;
@@ -425,12 +432,77 @@ export class Editor {
     this._onEvent(EVENT.CLOSE, {});
   }
 
+  // ----------------------------------------------------- action buttons
+
+  /** The buttons on every tab, and the ones belonging to the open one. */
+  _splitActions() {
+    const actions = this.chrome.actions ?? [];
+    const activeId = this.tabs.activeId;
+
+    return {
+      global: actions.filter((a) => !a.tab),
+      scoped: actions.filter((a) => a.tab && a.tab === activeId),
+    };
+  }
+
+  /** Whether the second bar's contents depend on which tab is open. */
+  _hasScopedActions() {
+    return (this.chrome.actions ?? []).some((a) => !!a.tab);
+  }
+
+  /**
+   * The open tab's document as it stands on screen.
+   *
+   * `_docs` only moves when the runtime echoes an edit back, which can be a
+   * poll away, so anything still queued is replayed onto a copy first. Without
+   * that, Copy and Save right after typing would hand back the old value.
+   */
+  currentDoc() {
+    const doc = this._docs.get(this.tabs.activeId);
+    if (doc === undefined || !this._pending.length) return doc ?? null;
+
+    let working;
+    try {
+      working = JSON.parse(JSON.stringify(doc));
+    } catch {
+      return doc;
+    }
+
+    for (const op of this._pending) applyOp(working, op, this.detect);
+    return working;
+  }
+
+  emitAction(action, extra = {}) {
+    this._onEvent(EVENT.ACTION, {
+      id: action.id,
+      kind: action.kind,
+      tabId: this.tabs.activeId,
+      ...extra,
+    });
+  }
+
+  /**
+   * A button was pressed. Anything it can do here happens first, so an edit the
+   * project makes in response to the trigger lands on top of it rather than
+   * being overwritten by it.
+   */
+  runAction(action) {
+    // Read before the flush: flushPending empties the queue that currentDoc
+    // replays, and the runtime's answer would not be back in time anyway.
+    const doc = this.currentDoc();
+    this.flushPending();
+
+    if (runBuiltIn(this, action, doc)) return;
+    this.emitAction(action);
+  }
+
   selectTab(id) {
     if (!this.tabs.has(id) || id === this.tabs.activeId) return;
     this._saveViewState();
     this.flushPending();
     this.tabs.select(id);
-    this._syncTabButtons();
+    if (this._hasScopedActions()) this._renderHeader();
+    else this._syncTabButtons();
     if (this._search) this._search.value = this.state?.query ?? "";
     this._render();
     this._host.scrollTop = this.state?.scrollTop ?? 0;
@@ -616,6 +688,13 @@ export class Editor {
     search.value = previousQuery;
     this._search = search;
     parts.push(bar);
+
+    // Last, so the theme's bottom border lands on whichever bar ends the
+    // header. The tab-scoped row sits closest to the tree it belongs to.
+    const { global, scoped } = this._splitActions();
+    if (global.length) parts.push(buildActionBar(this, global).bar);
+    if (scoped.length)
+      parts.push(buildActionBar(this, scoped, " je-actionbar-tab").bar);
 
     this._header.replaceChildren(...parts);
     this._header.hidden = parts.every((p) => p.hidden);

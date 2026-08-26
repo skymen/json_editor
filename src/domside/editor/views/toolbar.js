@@ -1,7 +1,9 @@
-// The sticky header: a tab bar with an optional close button, and a toolbar
-// with the key filter and Collapse all.
+// The sticky header: a tab bar with an optional close button, a toolbar with
+// the key filter and Collapse all, and the action button bars underneath.
 
 import { make, makeButton } from "../dom.js";
+import { actionKind } from "../../../shared/actionButtons.js";
+import { isActionDisabled } from "../actions.js";
 
 /**
  * The tab bar row. `showTabs` decides whether the tab buttons themselves are
@@ -65,4 +67,32 @@ export function buildToolbar(ctx) {
 
   bar.hidden = !ctx.chrome.filter && !ctx.chrome.collapseAll;
   return { bar, search };
+}
+
+/**
+ * A row of custom action buttons.
+ *
+ * Used twice: once for the buttons that belong to every tab, and once for the
+ * ones scoped to whichever tab is open. Both act on the open tab, so a button
+ * whose kind cannot do anything to that tab's source is shown disabled rather
+ * than quietly doing nothing.
+ */
+export function buildActionBar(ctx, actions, extraClass = "") {
+  const bar = make("div", `je-bar je-actionbar${extraClass}`);
+
+  const buttons = new Map();
+  for (const action of actions) {
+    const btn = makeButton(
+      "je-action",
+      action.label,
+      actionKind(action.kind).title,
+      () => ctx.runAction(action),
+      isActionDisabled(ctx, action),
+    );
+    buttons.set(action.id, btn);
+    bar.append(btn);
+  }
+
+  bar.hidden = !actions.length;
+  return { bar, buttons };
 }

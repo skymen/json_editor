@@ -47,6 +47,7 @@ export const aceCategories = {
   "config-top-bar": "Config: top bar",
   "config-editing": "Config: editing",
   navigation: "Navigation",
+  actions: "Action buttons",
   events: "Events",
 };
 

@@ -13,7 +13,7 @@
 
 export const MSG = {
   CONFIG: "config",
-  TABS: "tabs", // { tabs: [{ id, label, structural }], activeId }
+  TABS: "tabs", // { tabs: [{ id, label, structural, kind }], activeId }
   DATA: "data",
   STYLE: "style",
   COMMAND: "command",
@@ -61,6 +61,7 @@ export const EVENT = {
   BLUR: "blur", // { path }
   CLOSE: "close", // {}
   TAB_SELECTED: "tabSelected", // { tabId }
+  ACTION: "action", // { id, tabId, doc } - doc only when the button imported one
   FILTER: "filter", // { text }
   VIEW_STATE: "viewState", // { tabs: {...}, active }
 };
@@ -110,6 +111,9 @@ export function defaultConfig() {
       filter: true,
       collapseAll: true,
       close: false,
+      // [{ id, label, kind, tab, filename }]. An empty tab means every tab;
+      // anything else scopes the button to that one and moves it to its own bar.
+      actions: [],
     },
     tuning: {
       uiScale: 0.6,

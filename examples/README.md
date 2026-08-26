@@ -16,6 +16,27 @@ through with the buttons at the bottom of each page.
 The project has no images or sounds and depends only on stock plugins, so it
 opens quickly and is easy to read.
 
+## action-buttons.c3p
+
+A single page showing the optional action button bar.
+
+Three tabs, one editor. Four built-in buttons sit on the bar for every tab:
+**Copy** puts the open tab's JSON on the clipboard, **Save** writes it out named
+after the tab's label, **Import** reads a file back, and **Clear** empties the
+tab in whatever shape that tab's object needs — `{}` for the JSON object, an
+empty `c2dictionary` for the Dictionary, `0x1x1` for the Array.
+
+Import is deliberately strict. The Options tab only accepts a `c2dictionary`
+and the Grid tab only a `c2array`, because writing any other shape back would
+be silently dropped by the source. Save one out and feed it back to see the
+round trip; feed the wrong one in to see the refusal.
+
+**Randomise** and **Fill** are custom buttons. They do nothing on their own —
+they only fire *On action button clicked*, and the event sheet decides what
+that means. Both name a tab, so they sit on a second bar that appears only
+while their own tab is open. The three buttons down the right hand side add and
+remove buttons at runtime.
+
 ## editor-theme.css
 
 The shallow end: a block of `--je-*` overrides and nothing else. Loaded in

@@ -8,6 +8,7 @@
         "description": "An in-game tree editor for JSON, Dictionary and Array objects, and for global variables.",
         "help-url": "https://github.com/skymen/json_editor",
         "aceCategories": {
+          "actions": "Action buttons",
           "config-editing": "Config: editing",
           "config-top-bar": "Config: top bar",
           "navigation": "Navigation",
@@ -203,6 +204,53 @@
           }
         },
         "actions": {
+          "add-action-button": {
+            "list-name": "Add action button",
+            "display-text": "Add action button [b]{0}[/b] labelled [i]{1}[/i] doing [b]{2}[/b] on tab [i]{3}[/i]",
+            "description": "Add a button to the action bar, or reconfigure one that already exists. A custom button only fires On action button clicked and leaves the rest to you; the built-in kinds work on whichever tab is open, and Save to file writes under the tab's label. Leave the tab empty to show the button on every tab, or name one to move it to its own bar underneath.",
+            "params": {
+              "button": {
+                "name": "Button ID",
+                "desc": "A name for this button, used by the trigger and by Remove action button."
+              },
+              "label": {
+                "name": "Label",
+                "desc": "The text shown on the button. Leave empty to use the default for the kind."
+              },
+              "kind": {
+                "name": "Kind",
+                "desc": "What pressing the button does.",
+                "items": {
+                  "custom": "Custom (trigger only)",
+                  "copy": "Copy data",
+                  "save": "Save to file",
+                  "import": "Import from file",
+                  "clear": "Clear"
+                }
+              },
+              "tab": {
+                "name": "Tab",
+                "desc": "The tab this button belongs to. Leave empty to show it on every tab."
+              }
+            }
+          },
+          "clear-action-buttons": {
+            "list-name": "Clear action buttons",
+            "display-text": "Clear action buttons",
+            "description": "Remove every action button, from both bars.",
+            "params": {}
+          },
+          "remove-action-button": {
+            "list-name": "Remove action button",
+            "display-text": "Remove action button [b]{0}[/b]",
+            "description": "Remove one action button. The bar disappears once it holds none.",
+            "params": {
+              "button": {
+                "name": "Button ID",
+                "desc": "The button to remove."
+              }
+            }
+          },
           "set-add-buttons": {
             "list-name": "Set add buttons",
             "display-text": "Set add buttons to [b]{0}[/b]",
@@ -670,6 +718,23 @@
           }
         },
         "conditions": {
+          "on-action-button-clicked": {
+            "list-name": "On action button clicked",
+            "display-text": "On action button [b]{0}[/b] clicked",
+            "description": "Triggered when that action button is pressed. Built-in buttons fire it too, after they have done their work.",
+            "params": {
+              "button": {
+                "name": "Button ID",
+                "desc": "The button to listen for."
+              }
+            }
+          },
+          "on-any-action-button-clicked": {
+            "list-name": "On any action button clicked",
+            "display-text": "On any action button clicked",
+            "description": "Triggered when any action button is pressed. Use Action button ID to tell which.",
+            "params": {}
+          },
           "on-any-edit": {
             "list-name": "On any edit",
             "display-text": "On any edit",
@@ -744,6 +809,11 @@
           }
         },
         "expressions": {
+          "action-button-id": {
+            "translated-name": "ActionButtonId",
+            "description": "The ID of the action button that was last pressed.",
+            "params": {}
+          },
           "last-key": {
             "translated-name": "LastKey",
             "description": "The key or index the last edit touched.",

@@ -44,6 +44,7 @@ npm run dev
 ## Examples Files
 | Description | Download |
 | --- | --- |
+| action-buttons | [<img src="https://placehold.co/120x30/4493f8/FFF?text=Download&font=montserrat" width="120"/>](https://github.com/skymen/json_editor/raw/refs/heads/main/examples/action-buttons.c3p) |
 | json-editor-showcase | [<img src="https://placehold.co/120x30/4493f8/FFF?text=Download&font=montserrat" width="120"/>](https://github.com/skymen/json_editor/raw/refs/heads/main/examples/json-editor-showcase.c3p) |
 
 ---
@@ -96,6 +97,9 @@ npm run dev
 ## Actions
 | Action | Description | Params
 | --- | --- | --- |
+| Add action button | Add a button to the action bar, or reconfigure one that already exists. A custom button only fires On action button clicked and leaves the rest to you; the built-in kinds work on whichever tab is open, and Save to file writes under the tab's label. Leave the tab empty to show the button on every tab, or name one to move it to its own bar underneath. | Button ID             *(string)* <br>Label             *(string)* <br>Kind             *(combo)* <br>Tab             *(string)* <br> |
+| Clear action buttons | Remove every action button, from both bars. |  |
+| Remove action button | Remove one action button. The bar disappears once it holds none. | Button ID             *(string)* <br> |
 | Set add buttons | Which kinds of new entry the add bars offer. | Mode             *(combo)* <br> |
 | Set add/remove array elements | Whether elements can be added to and removed from arrays. | Enabled             *(boolean)* <br> |
 | Set add/remove object keys | Whether keys can be added to and removed from plain objects. | Enabled             *(boolean)* <br> |
@@ -141,6 +145,8 @@ npm run dev
 ## Conditions
 | Condition | Description | Params
 | --- | --- | --- |
+| On action button clicked | Triggered when that action button is pressed. Built-in buttons fire it too, after they have done their work. | Button ID *(string)* <br> |
+| On any action button clicked | Triggered when any action button is pressed. Use Action button ID to tell which. |  |
 | On any edit | Triggered after any edit at all, in addition to the specific trigger for it. |  |
 | On close clicked | Triggered when the close button is clicked, after pending edits have been written. |  |
 | On element added | Triggered after an element has been added to an array or a c2array. |  |
@@ -159,6 +165,7 @@ npm run dev
 ## Expressions
 | Expression | Description | Return Type | Params
 | --- | --- | --- | --- |
+| ActionButtonId | The ID of the action button that was last pressed. | string |  | 
 | LastKey | The key or index the last edit touched. | string |  | 
 | LastOldValue | What was there before the last edit: the previous value, the previous key name, or the index an element came from. | any |  | 
 | LastPath | The dot separated path of the last edit or focus change, such as player.inventory.2.name. | string |  | 

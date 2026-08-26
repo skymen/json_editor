@@ -134,6 +134,22 @@
   min-width: 0;
 }
 
+/* Action buttons read left to right, unlike the right-aligned chrome above
+   them, and wrap rather than squeezing once there are more than fit. */
+.je-actionbar {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  row-gap: 0.25em;
+}
+
+.je-action {
+  flex: 0 0 auto;
+  max-width: 14em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ------------------------------------------------------------------ tree */
 
 .je-children {
