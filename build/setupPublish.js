@@ -6,7 +6,8 @@
 // nothing at all for every addon after it.
 //
 // Values go to `gh` through stdin rather than --body, so the password never
-// lands in argv where `ps` could read it.
+// lands in argv where `ps` could read it. `gh secret set` reads the value from
+// standard input whenever --body is absent, which is exactly what we want.
 
 import fs from "fs";
 import os from "os";
@@ -18,6 +19,8 @@ import fromConsole from "./fromConsole.js";
 
 const CREDENTIALS_DIR = path.join(os.homedir(), ".caw");
 const CREDENTIALS_FILE = path.join(CREDENTIALS_DIR, "publish-credentials.json");
+/** Shown rather than the absolute path, which is long and mostly noise. */
+const CREDENTIALS_LABEL = path.join("~", ".caw", "publish-credentials.json");
 
 /** The construct.net login c3addon drives, plus the optional itch.io key. */
 const SECRETS = [
@@ -31,27 +34,75 @@ const SECRETS = [
   { key: "butlerApiKey", secret: "BUTLER_API_KEY", optional: true },
 ];
 
-function ask(question, hidden = false) {
+function askVisible(question) {
   return new Promise((resolve) => {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
       terminal: true,
     });
-
-    // readline has no password mode, so the prompt is written by hand and the
-    // echo of every keystroke is swallowed until the answer comes back.
-    if (hidden) {
-      process.stdout.write(`${question}: `);
-      rl._writeToOutput = () => {};
-    }
-
-    rl.question(hidden ? "" : `${question}: `, (answer) => {
+    rl.question(`${question}: `, (answer) => {
       rl.close();
-      if (hidden) process.stdout.write("\n");
       resolve(answer.trim());
     });
   });
+}
+
+/**
+ * Read a line without echoing it.
+ *
+ * Done by hand rather than through readline, which has no password mode and
+ * whose only way to suppress the echo also suppresses the prompt. Raw mode
+ * hands over one keypress at a time, so nothing is drawn that should not be.
+ */
+function askHidden(question) {
+  const stdin = process.stdin;
+  if (!stdin.isTTY) return askVisible(question);
+
+  return new Promise((resolve) => {
+    // Raw mode first, prompt second. The other way round the prompt gets out
+    // before the terminal has stopped echoing, and the password appears.
+    const wasRaw = stdin.isRaw;
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding("utf8");
+
+    process.stdout.write(`${question}: `);
+
+    let value = "";
+
+    const finish = (answer) => {
+      stdin.removeListener("data", onData);
+      stdin.setRawMode(wasRaw);
+      stdin.pause();
+      process.stdout.write("\n");
+      resolve(answer);
+    };
+
+    // A paste arrives as one chunk, so this walks the characters rather than
+    // assuming a keypress each time.
+    const onData = (chunk) => {
+      for (const ch of chunk) {
+        if (ch === "\r" || ch === "\n" || ch === "\u0004") return finish(value.trim());
+
+        if (ch === "\u0003") {
+          // Ctrl-C: leave the terminal as it was found before bailing out.
+          stdin.setRawMode(wasRaw);
+          process.stdout.write("\n");
+          process.exit(130);
+        }
+
+        if (ch === "\u007f" || ch === "\b") value = value.slice(0, -1);
+        else if (ch >= " ") value += ch;
+      }
+    };
+
+    stdin.on("data", onData);
+  });
+}
+
+export function ask(question, hidden = false) {
+  return hidden ? askHidden(question) : askVisible(question);
 }
 
 function readCache() {
@@ -97,7 +148,8 @@ function hasWorkingGh() {
 }
 
 function setSecret(repo, name, value) {
-  execFileSync("gh", ["secret", "set", name, "--repo", repo, "--body-file", "-"], {
+  // No --body: gh reads the value from stdin, so it never reaches argv.
+  execFileSync("gh", ["secret", "set", name, "--repo", repo], {
     input: value,
     stdio: ["pipe", "ignore", "inherit"],
   });
@@ -148,11 +200,11 @@ export default async function setupPublish() {
 
   if (prompted) {
     const save = await ask(
-      `Remember these in ${CREDENTIALS_FILE} so future addons need no prompt? [Y/n]`
+      `Remember these in ${CREDENTIALS_LABEL} so future addons need no prompt? [Y/n]`
     );
     if (!save || save.toLowerCase().startsWith("y")) {
       writeCache(credentials);
-      chalkUtils.subSuccess("Credentials cached", `(${CREDENTIALS_FILE}, 0600)`);
+      chalkUtils.subSuccess("Credentials cached", `(${CREDENTIALS_LABEL}, 0600)`);
     }
   }
 
@@ -161,7 +213,20 @@ export default async function setupPublish() {
 
   for (const { key, secret } of SECRETS) {
     if (!credentials[key]) continue;
-    setSecret(repo, secret, credentials[key]);
+
+    try {
+      setSecret(repo, secret, credentials[key]);
+    } catch {
+      // gh has already said what went wrong on stderr.
+      chalkUtils.error(
+        `Could not set ${secret}.\n` +
+          chalkUtils._errorUnderline(
+            `Check that you have admin rights on ${repo}.`
+          )
+      );
+      return;
+    }
+
     chalkUtils.subSuccess(secret, "set");
   }
 
