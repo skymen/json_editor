@@ -23,5 +23,10 @@
     "added": "Customiseable action buttons",
     "changed": "ACEs now use autocomplete IDs",
     "fixed": ""
+  },
+  "1.2.0.1": {
+    "added": "",
+    "changed": "",
+    "fixed": "Fixed a bug that could cause naming conflicts on the domside"
   }
 }
