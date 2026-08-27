@@ -28,5 +28,10 @@
     "added": "",
     "changed": "",
     "fixed": "Fixed a bug that could cause naming conflicts on the domside"
+  },
+  "1.2.1.0": {
+    "added": "Added common Z order and common hierarchy ACEs",
+    "changed": "",
+    "fixed": ""
   }
 }

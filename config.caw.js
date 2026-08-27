@@ -74,11 +74,11 @@ export const info = {
   },
   AddCommonACEs: {
     Position: true,
-    SceneGraph: false,
+    SceneGraph: true,
     Size: true,
     Angle: false,
     Appearance: true,
-    ZOrder: false,
+    ZOrder: true,
   },
 };
 
